@@ -53,8 +53,6 @@
         "**/*.test.tsx",
         "**/*.spec.ts",
         "vitest.config.ts",
-        "vitest.integration.config.ts",
-        "playwright.config.ts",
         "next.config.ts",
         "postcss.config.mjs",
         "prisma.config.ts",

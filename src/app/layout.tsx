@@ -20,11 +20,7 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
-  children,
-}: {
-  readonly children: ReactNode;
-}): React.JSX.Element {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="id">
       <body>

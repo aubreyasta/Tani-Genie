@@ -1,19 +1,19 @@
 export type Status = 'safe' | 'watch' | 'danger';
 
 export interface ApiProblem {
-  readonly error?: {
-    readonly message?: string;
+  error?: {
+    message?: string;
   };
-  readonly message?: string;
+  message?: string;
 }
 
 export interface WeatherInsightDto {
-  readonly verdict: import('@/types/api').VerdictDto;
-  readonly weather: import('@/types/api').WeatherSnapshotDto;
-  readonly pestAlerts: ReadonlyArray<import('@/types/api').PestAlertDto>;
-  readonly planting: {
-    readonly id: string;
-    readonly cropName: string;
-    readonly cropSlug: string;
+  verdict: import('@/types/api').VerdictDto;
+  weather: import('@/types/api').WeatherSnapshotDto;
+  pestAlerts: import('@/types/api').PestAlertDto[];
+  planting: {
+    id: string;
+    cropName: string;
+    cropSlug: string;
   };
 }

@@ -1,11 +1,13 @@
-export default function NotFound(): React.JSX.Element {
+import Link from 'next/link';
+
+export default function NotFound() {
   return (
-    <div style={{ padding: '2rem', maxWidth: '65ch' }}>
+    <div className="not-found">
       <h1>Halaman tidak ditemukan</h1>
       <p>Maaf, halaman yang Anda cari tidak tersedia.</p>
-      <a href="/" style={{ color: 'var(--accent-primary)' }}>
+      <Link href="/" className="text-link">
         Kembali ke beranda
-      </a>
+      </Link>
     </div>
   );
 }

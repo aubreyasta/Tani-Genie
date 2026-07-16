@@ -6,7 +6,7 @@ export default defineConfig({
     environment: 'node',
     globals: false,
     include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
-    exclude: ['node_modules', '.next', 'e2e', 'playwright-report', 'test-results'],
+    exclude: ['node_modules', '.next'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json'],

@@ -17,7 +17,7 @@ function priority(status: 'safe' | 'watch' | 'danger'): number {
   return status === 'danger' ? 3 : status === 'watch' ? 2 : 1;
 }
 
-export default async function HomePage(): Promise<React.JSX.Element> {
+export default async function HomePage() {
   const farmer = await catalogService.getDefaultFarmer();
   const [plantings, notifications] = await Promise.all([
     apiGet<ReadonlyArray<PlantingDto>>('/api/plantings'),
@@ -46,23 +46,9 @@ export default async function HomePage(): Promise<React.JSX.Element> {
   return (
     <div className="page-shell stack">
       <section className={`verdict-card verdict-${topWeather?.verdict.status ?? 'safe'}`}>
-        <p style={{ margin: 0, color: 'var(--accent-primary)', fontWeight: 800 }}>Tanigata</p>
-        <h1
-          style={{
-            margin: 'var(--space-2) 0 0',
-            fontSize: 'clamp(2rem, 8vw, 4rem)',
-            lineHeight: 1,
-          }}
-        >
-          Selamat datang, {farmer.name}
-        </h1>
-        <p
-          style={{
-            margin: 'var(--space-3) 0 0',
-            color: 'var(--text-secondary)',
-            fontSize: '1.125rem',
-          }}
-        >
+        <p className="eyebrow">Tanigata</p>
+        <h1 className="home-title">Selamat datang, {farmer.name}</h1>
+        <p className="home-copy">
           {topWeather
             ? topWeather.verdict.reason
             : 'Tambahkan tanaman agar Tanigata bisa memberi keputusan hari ini.'}
@@ -72,7 +58,7 @@ export default async function HomePage(): Promise<React.JSX.Element> {
       <section className="dashboard-grid" aria-label="Ringkasan dashboard">
         <Card>
           <strong>{activePlantings.length}</strong>
-          <p style={{ margin: 0, color: 'var(--text-secondary)' }}>Tanaman aktif</p>
+          <p className="muted flush">Tanaman aktif</p>
         </Card>
         <Card>
           {topWeather ? (
@@ -80,9 +66,7 @@ export default async function HomePage(): Promise<React.JSX.Element> {
           ) : (
             <StatusBadge status="safe" label="Kosong" />
           )}
-          <p style={{ margin: 'var(--space-2) 0 0', color: 'var(--text-secondary)' }}>
-            Status cuaca tertinggi
-          </p>
+          <p className="hero-copy">Status cuaca tertinggi</p>
         </Card>
         <Card>
           <strong>
@@ -90,54 +74,31 @@ export default async function HomePage(): Promise<React.JSX.Element> {
               ? `${formatRupiah(bestPrice.expectedPrice)} · minggu ${bestPrice.weekNumber}`
               : 'Belum ada'}
           </strong>
-          <p style={{ margin: 0, color: 'var(--text-secondary)' }}>Jendela harga terbaik</p>
+          <p className="muted flush">Jendela harga terbaik</p>
         </Card>
         <Card>
           <strong>{notifications.filter((item) => !item.isRead).length}</strong>
-          <p style={{ margin: 0, color: 'var(--text-secondary)' }}>Notifikasi belum dibaca</p>
+          <p className="muted flush">Notifikasi belum dibaca</p>
         </Card>
       </section>
 
       <section className="dashboard-grid" aria-label="Fitur Tanigata">
         {featureCards.map((card) => (
-          <Link
-            key={card.href}
-            href={card.href}
-            style={{
-              minHeight: 132,
-              border: '1px solid var(--border-default)',
-              borderRadius: 'var(--radius-lg)',
-              background: 'var(--surface-primary)',
-              color: 'var(--text-primary)',
-              display: 'grid',
-              alignContent: 'space-between',
-              padding: 'var(--space-4)',
-              textDecoration: 'none',
-            }}
-          >
-            <strong style={{ fontSize: '1.25rem' }}>{card.title}</strong>
-            <span style={{ color: 'var(--text-secondary)' }}>{card.description}</span>
+          <Link key={card.href} href={card.href} className="feature-link">
+            <strong>{card.title}</strong>
+            <span>{card.description}</span>
           </Link>
         ))}
       </section>
 
       <Card>
-        <h2 style={{ margin: 0 }}>Aksi Cepat</h2>
-        <p style={{ margin: 'var(--space-2) 0', color: 'var(--text-secondary)' }}>
+        <h2 className="flush">Aksi Cepat</h2>
+        <p className="quick-copy">
           {topNotification
             ? `${topNotification.title}: ${topNotification.body}`
             : (topWeather?.verdict.action ?? 'Semua tenang. Cek Kebunku untuk mulai.')}
         </p>
-        <Link
-          href={topNotification ? '/notifikasi' : '/peringatan'}
-          style={{
-            minHeight: 44,
-            display: 'inline-flex',
-            alignItems: 'center',
-            color: 'var(--accent-primary)',
-            fontWeight: 800,
-          }}
-        >
+        <Link href={topNotification ? '/notifikasi' : '/peringatan'} className="quick-link">
           Buka sekarang
         </Link>
       </Card>

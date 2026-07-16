@@ -5,7 +5,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { apiGet, formatDateTime, formatRupiah } from '@/lib/ui-data';
 import type { PlantingDto, PriceForecastDto } from '@/types/api';
 
-export default async function HargaPage(): Promise<React.JSX.Element> {
+export default async function HargaPage() {
   const plantings = (await apiGet<ReadonlyArray<PlantingDto>>('/api/plantings')).filter(
     (planting) => planting.status === 'active',
   );
@@ -22,15 +22,13 @@ export default async function HargaPage(): Promise<React.JSX.Element> {
   return (
     <div className="page-shell stack">
       <section className="verdict-card verdict-safe">
-        <p style={{ margin: 0, color: 'var(--accent-primary)', fontWeight: 800 }}>Harga</p>
-        <h1 style={{ margin: 'var(--space-2) 0 0', fontSize: '2rem', lineHeight: 1.1 }}>
+        <p className="eyebrow">Harga</p>
+        <h1 className="hero-title">
           {nearest
             ? `Peluang jual terdekat minggu ${nearest.weekNumber}`
             : 'Pantau harga sebelum jual'}
         </h1>
-        <p style={{ margin: 'var(--space-2) 0 0', color: 'var(--text-secondary)' }}>
-          Data demo. Ketidakpastian meningkat setelah minggu 4.
-        </p>
+        <p className="hero-copy">Data demo. Ketidakpastian meningkat setelah minggu 4.</p>
       </section>
 
       {forecasts.length === 0 ? (
@@ -41,8 +39,8 @@ export default async function HargaPage(): Promise<React.JSX.Element> {
         <Card key={planting.id}>
           <div className="stack">
             <div>
-              <h2 style={{ margin: 0 }}>{planting.cropName}</h2>
-              <p style={{ margin: 0, color: 'var(--text-secondary)' }}>
+              <h2 className="flush">{planting.cropName}</h2>
+              <p className="muted flush">
                 Harga sekarang: <strong>{formatRupiah(forecast.currentPrice)}/kg</strong> ·{' '}
                 {formatDateTime(forecast.generatedAt)}
               </p>
@@ -80,7 +78,7 @@ export default async function HargaPage(): Promise<React.JSX.Element> {
                 </tbody>
               </table>
             </div>
-            <p style={{ margin: 0, color: 'var(--text-secondary)' }}>
+            <p className="muted flush">
               Sumber: {forecast.source}. Data demo — bukan harga pasar langsung.
             </p>
             <Button

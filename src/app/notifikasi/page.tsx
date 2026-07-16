@@ -17,7 +17,7 @@ function priorityStatus(priority: NotificationDto['priority']) {
   return 'safe' as const;
 }
 
-export default async function NotifikasiPage(): Promise<React.JSX.Element> {
+export default async function NotifikasiPage() {
   const farmer = await catalogService.getDefaultFarmer();
   const notifications = await apiGet<ReadonlyArray<NotificationDto>>('/api/notifications');
   const deliveries = await Promise.all(
@@ -32,13 +32,11 @@ export default async function NotifikasiPage(): Promise<React.JSX.Element> {
   return (
     <div className="page-shell stack">
       <section className="verdict-card verdict-watch">
-        <p style={{ margin: 0, color: 'var(--accent-primary)', fontWeight: 800 }}>Notifikasi</p>
-        <h1 style={{ margin: 'var(--space-2) 0 0', fontSize: '2rem', lineHeight: 1.1 }}>
+        <p className="eyebrow">Notifikasi</p>
+        <h1 className="hero-title">
           {notifications.filter((item) => !item.isRead).length} belum dibaca
         </h1>
-        <p style={{ margin: 'var(--space-2) 0 0', color: 'var(--text-secondary)' }}>
-          Buat pengingat cuaca dan harga untuk {farmer.name}.
-        </p>
+        <p className="hero-copy">Buat pengingat cuaca dan harga untuk {farmer.name}.</p>
       </section>
 
       <Button endpoint="/api/notifications/generate" body={{ farmerId: farmer.id }}>
@@ -53,44 +51,30 @@ export default async function NotifikasiPage(): Promise<React.JSX.Element> {
         const itemDeliveries =
           deliveries.find((item) => item.id === notification.id)?.attempts ?? [];
         return (
-          <Card
-            key={notification.id}
-            style={{
-              borderColor: notification.isRead ? 'var(--border-default)' : 'var(--accent-primary)',
-            }}
-          >
+          <Card key={notification.id} className={notification.isRead ? '' : 'card-unread'}>
             <div className="stack">
-              <div
-                style={{ display: 'flex', justifyContent: 'space-between', gap: 'var(--space-3)' }}
-              >
+              <div className="row-between">
                 <StatusBadge
                   status={priorityStatus(notification.priority)}
                   label={notification.priority.toUpperCase()}
                 />
-                <span style={{ color: 'var(--text-muted)' }}>
+                <span className="subtle">
                   {notification.isRead ? 'Sudah dibaca' : 'Belum dibaca'}
                 </span>
               </div>
               <div>
-                <h2 style={{ margin: 0 }}>{notification.title}</h2>
-                <p style={{ margin: 'var(--space-2) 0 0', color: 'var(--text-secondary)' }}>
-                  {notification.body}
-                </p>
-                <p style={{ margin: 'var(--space-2) 0 0', color: 'var(--text-muted)' }}>
-                  {formatDateTime(notification.createdAt)}
-                </p>
+                <h2 className="flush">{notification.title}</h2>
+                <p className="muted meta-block">{notification.body}</p>
+                <p className="subtle meta-block">{formatDateTime(notification.createdAt)}</p>
               </div>
               <NotificationActions id={notification.id} />
               <div>
-                <h3 style={{ margin: '0 0 var(--space-2)' }}>Riwayat kirim</h3>
+                <h3 className="history-title">Riwayat kirim</h3>
                 {itemDeliveries.length === 0 ? (
-                  <p style={{ margin: 0, color: 'var(--text-muted)' }}>Belum pernah dikirim.</p>
+                  <p className="subtle flush">Belum pernah dikirim.</p>
                 ) : null}
                 {itemDeliveries.map((attempt) => (
-                  <p
-                    key={attempt.id}
-                    style={{ margin: '0 0 var(--space-1)', color: 'var(--text-secondary)' }}
-                  >
+                  <p key={attempt.id} className="delivery-row">
                     {attempt.channel.toUpperCase()} · {attempt.status} ·{' '}
                     {formatDateTime(attempt.attemptedAt)}{' '}
                     {attempt.errorMessage ? `· ${attempt.errorMessage}` : ''}

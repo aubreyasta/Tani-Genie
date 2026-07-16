@@ -89,8 +89,7 @@ Aplikasi menggunakan data dummy deterministik:
 ```bash
 pnpm typecheck        # TypeScript strict check
 pnpm lint             # Biome lint + format
-pnpm test             # Unit tests (Vitest)
-pnpm test:e2e         # E2E tests (Playwright)
+pnpm test             # Unit dan route tests (Vitest)
 pnpm build            # Production build
 ```
 
@@ -101,23 +100,10 @@ pnpm build            # Production build
 - Prisma 7 + PostgreSQL
 - Tailwind CSS 4
 - Biome (linter + formatter)
-- Vitest + Playwright
+- Vitest
 
 ## Atribusi Data
 
 - Data cuaca: BMKG (badge ditampilkan di UI)
 - Data harga: Panel Harga Bapanas
 - Semua data dalam aplikasi ini adalah **dummy demo**, bukan data real-time.
-
-## Arsitektur
-
-```text
-src/
-├── app/              # Next.js App Router (pages + API routes)
-├── components/       # UI components (ui, layout, features)
-├── lib/              # Shared utilities (prisma, errors, schemas, api-response)
-├── modules/          # Domain modules (catalog, insights, prices, notifications)
-└── types/            # TypeScript types and DTOs
-```
-
-Domain logic terpisah dari Prisma via repository ports. Ganti adapter dummy dengan provider nyata di `src/modules/*/provider.ts`.

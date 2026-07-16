@@ -20,7 +20,6 @@ export class PriceService {
       throw new NotFoundError('Profil komoditas', planting.crop.commodityKey);
     }
 
-    // Get latest stored price observation, or fetch from provider
     let observation = await prisma.priceObservation.findFirst({
       where: { commodityKey: profile.commodityKey },
       orderBy: { observedAt: 'desc' },
@@ -42,7 +41,6 @@ export class PriceService {
     const currentPrice = Number(observation.pricePerKg);
     const forecast = generateForecast(profile.commodityKey, currentPrice, plantingId, new Date());
 
-    // Validate invariants before returning
     validateForecast(forecast);
 
     return forecast;
@@ -62,11 +60,9 @@ export class PriceService {
       throw new NotFoundError('Profil komoditas', planting.crop.commodityKey);
     }
 
-    // Fetch fresh price from provider
     const reading = await dummyPriceProvider.fetch(profile.commodityKey);
     const observationId = `price-${profile.commodityKey}-${reading.observedAt.toISOString().split('T')[0]}`;
 
-    // Upsert observation
     const observation = await prisma.priceObservation.upsert({
       where: {
         id: observationId,

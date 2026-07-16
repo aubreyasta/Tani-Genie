@@ -10,8 +10,6 @@
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "test": "vitest run",
-    "test:integration": "vitest run --config vitest.integration.config.ts",
-    "test:e2e": "playwright test",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
@@ -26,8 +24,7 @@
     "zod": "^4.0.0",
     "@prisma/client": "^7.0.0",
     "@prisma/adapter-pg": "^7.0.0",
-    "pg": "^8.13.0",
-    "@phosphor-icons/react": "^2.1.0"
+    "pg": "^8.13.0"
   },
   "devDependencies": {
     "typescript": "^5.6.0",
@@ -39,16 +36,7 @@
     "tsx": "^4.19.0",
     "@biomejs/biome": "^2.0.0",
     "vitest": "^2.0.0",
-    "@playwright/test": "^1.48.0",
     "tailwindcss": "^4.0.0",
     "@tailwindcss/postcss": "^4.0.0"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@prisma/engines",
-      "esbuild",
-      "prisma",
-      "sharp"
-    ]
   }
 }

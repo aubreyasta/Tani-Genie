@@ -2,9 +2,9 @@
 
 import { Button } from '@/components/ui/Button';
 
-export function NotificationActions({ id }: { readonly id: string }): React.JSX.Element {
+export function NotificationActions({ id }: { id: string }) {
   return (
-    <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+    <div className="actions">
       <Button endpoint={`/api/notifications/${id}/read`} method="PATCH" variant="secondary">
         Tandai dibaca
       </Button>

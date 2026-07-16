@@ -8,8 +8,7 @@ export function generateForecast(
 ): PriceForecastDto {
   const points: PriceForecastPointDto[] = [];
 
-  // Deterministic weekly multipliers — NOT a real model, just demo fixtures
-  // Slight upward trend for cabai, slight downward for bawang
+  // Demo trend until the forecasting model is connected.
   const trendDirection = commodityKey === 'cabai-merah' ? 1.02 : 0.98;
 
   let expectedPrice = currentPrice;
@@ -17,7 +16,6 @@ export function generateForecast(
   let bestSellPrice = currentPrice;
 
   for (let week = 1; week <= 8; week += 1) {
-    // Apply deterministic trend
     expectedPrice = Math.round(currentPrice * trendDirection ** week);
 
     // Confidence widens after week 4
@@ -41,11 +39,9 @@ export function generateForecast(
     });
   }
 
-  // Mark the best sell window (bestSellWeek and adjacent week)
   const bestSellStart = Math.max(1, bestSellWeek - 1);
   const bestSellEnd = Math.min(8, bestSellWeek + 1);
 
-  // Re-mark isBestSell for the window
   const finalPoints = points.map((point) => ({
     ...point,
     isBestSell: point.weekNumber >= bestSellStart && point.weekNumber <= bestSellEnd,
@@ -66,7 +62,6 @@ export function generateForecast(
   };
 }
 
-// Verify forecast invariants — used by tests
 export function validateForecast(forecast: PriceForecastDto): void {
   if (forecast.points.length !== 8) {
     throw new Error(`Expected 8 forecast points, got ${forecast.points.length}`);

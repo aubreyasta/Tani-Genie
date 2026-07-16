@@ -1,5 +1,5 @@
 import { Loading } from '@/components/ui/Loading';
 
-export default function LoadingPage(): React.JSX.Element {
+export default function LoadingPage() {
   return <Loading />;
 }

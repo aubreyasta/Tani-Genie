@@ -1,10 +1,5 @@
 import { z } from 'zod';
 
-export const paginationSchema = z.object({
-  page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(100).default(20),
-});
-
 export const createPlotSchema = z.object({
   farmerId: z.string().uuid(),
   name: z.string().min(1, 'Nama lahan wajib diisi').max(200),

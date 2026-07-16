@@ -1,20 +1,14 @@
 import type { ReactNode } from 'react';
 import { Card } from './Card';
 
-export function EmptyState({
-  message,
-  action,
-}: {
-  readonly message: string;
-  readonly action?: ReactNode;
-}) {
+export function EmptyState({ message, action }: { message: string; action?: ReactNode }) {
   return (
     <Card>
-      <div style={{ display: 'grid', gap: 'var(--space-3)', justifyItems: 'start' }}>
-        <span aria-hidden="true" style={{ fontSize: '2rem' }}>
+      <div className="empty-state">
+        <span aria-hidden="true" className="empty-state-icon">
           🌱
         </span>
-        <p style={{ margin: 0, color: 'var(--text-secondary)' }}>{message}</p>
+        <p className="muted flush">{message}</p>
         {action}
       </div>
     </Card>

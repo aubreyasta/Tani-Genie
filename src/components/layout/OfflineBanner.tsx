@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-export function OfflineBanner(): React.JSX.Element | null {
+export function OfflineBanner() {
   const [isOffline, setIsOffline] = useState(false);
 
   useEffect(() => {
@@ -26,17 +26,7 @@ export function OfflineBanner(): React.JSX.Element | null {
   }
 
   return (
-    <div
-      role="alert"
-      style={{
-        padding: '12px 16px',
-        backgroundColor: 'var(--status-warning)',
-        color: 'white',
-        textAlign: 'center',
-        fontSize: '14px',
-        fontWeight: 500,
-      }}
-    >
+    <div role="alert" className="offline-banner">
       Mode offline — menampilkan data tersimpan. Beberapa fitur tidak tersedia.
     </div>
   );

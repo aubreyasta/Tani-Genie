@@ -6,7 +6,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { apiGet, formatDate, formatNumber } from '@/lib/ui-data';
 import type { CropDto, PlantingDto, PlotDto } from '@/types/api';
 
-export default async function KebunkuPage(): Promise<React.JSX.Element> {
+export default async function KebunkuPage() {
   const [plots, plantings, crops] = await Promise.all([
     apiGet<ReadonlyArray<PlotDto>>('/api/plots'),
     apiGet<ReadonlyArray<PlantingDto>>('/api/plantings'),
@@ -17,11 +17,11 @@ export default async function KebunkuPage(): Promise<React.JSX.Element> {
   return (
     <div className="page-shell stack">
       <section className="verdict-card verdict-safe">
-        <p style={{ margin: 0, color: 'var(--accent-primary)', fontWeight: 800 }}>Kebunku</p>
-        <h1 style={{ margin: 'var(--space-2) 0 0', fontSize: '2rem', lineHeight: 1.1 }}>
+        <p className="eyebrow">Kebunku</p>
+        <h1 className="hero-title">
           {activeCount > 0 ? `${activeCount} tanaman aktif dipantau` : 'Tambahkan tanaman pertama'}
         </h1>
-        <p style={{ margin: 'var(--space-2) 0 0', color: 'var(--text-secondary)' }}>
+        <p className="hero-copy">
           Daftar lahan dipakai untuk menghitung cuaca, hama, dan jendela harga.
         </p>
       </section>
@@ -40,27 +40,22 @@ export default async function KebunkuPage(): Promise<React.JSX.Element> {
             <Card key={plot.id}>
               <div className="stack">
                 <div>
-                  <h2 style={{ margin: 0 }}>{plot.name}</h2>
-                  <p style={{ margin: 'var(--space-1) 0 0', color: 'var(--text-secondary)' }}>
+                  <h2 className="flush">{plot.name}</h2>
+                  <p className="muted meta">
                     {formatNumber(plot.areaM2)} m² · {plot.latitude.toFixed(3)},{' '}
                     {plot.longitude.toFixed(3)}
                   </p>
                 </div>
 
                 {activePlanting ? (
-                  <div
-                    style={{
-                      borderTop: '1px solid var(--border-subtle)',
-                      paddingTop: 'var(--space-3)',
-                    }}
-                  >
+                  <div className="card-section">
                     <StatusBadge status="safe" label="Aktif" />
-                    <h3 style={{ margin: 'var(--space-2) 0 0' }}>{activePlanting.cropName}</h3>
-                    <p style={{ margin: 0, color: 'var(--text-secondary)' }}>
+                    <h3 className="subheading">{activePlanting.cropName}</h3>
+                    <p className="muted flush">
                       Benih {activePlanting.seedName} · Tanam {formatDate(activePlanting.plantedAt)}{' '}
                       · Panen {formatDate(activePlanting.expectedHarvestAt)}
                     </p>
-                    <div style={{ marginTop: 'var(--space-3)' }}>
+                    <div className="action-top">
                       <Button
                         endpoint={`/api/plantings/${activePlanting.id}`}
                         method="PATCH"
@@ -72,10 +67,10 @@ export default async function KebunkuPage(): Promise<React.JSX.Element> {
                     </div>
                   </div>
                 ) : (
-                  <p style={{ margin: 0, color: 'var(--text-muted)' }}>Belum ada tanaman aktif.</p>
+                  <p className="subtle flush">Belum ada tanaman aktif.</p>
                 )}
 
-                <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+                <div className="actions">
                   {!activePlanting ? <AddPlantingPanel plotId={plot.id} crops={crops} /> : null}
                   {!activePlanting ? (
                     <Button endpoint={`/api/plots/${plot.id}`} method="DELETE" variant="danger">

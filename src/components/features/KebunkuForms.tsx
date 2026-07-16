@@ -10,7 +10,7 @@ function field(data: Record<string, FormDataEntryValue>, name: string): string {
   return String(data[name]);
 }
 
-export function AddPlotPanel(): React.JSX.Element {
+export function AddPlotPanel() {
   const [open, setOpen] = useState(false);
   return (
     <div className="stack">
@@ -19,7 +19,7 @@ export function AddPlotPanel(): React.JSX.Element {
       </Button>
       {open ? (
         <Card>
-          <h2 style={{ margin: '0 0 var(--space-3)' }}>Tambah lahan</h2>
+          <h2 className="form-title">Tambah lahan</h2>
           <Form action="/api/plots" submitLabel="Simpan Lahan" onSuccess={() => setOpen(false)}>
             <label className="field">
               Nama lahan
@@ -52,13 +52,7 @@ export function AddPlotPanel(): React.JSX.Element {
   );
 }
 
-export function AddPlantingPanel({
-  plotId,
-  crops,
-}: {
-  readonly plotId: string;
-  readonly crops: ReadonlyArray<CropDto>;
-}): React.JSX.Element {
+export function AddPlantingPanel({ plotId, crops }: { plotId: string; crops: readonly CropDto[] }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="stack">
@@ -66,7 +60,7 @@ export function AddPlantingPanel({
         Tambah Tanaman
       </Button>
       {open ? (
-        <Card style={{ background: 'var(--surface-secondary)' }}>
+        <Card className="card-muted">
           <Form
             action="/api/plantings"
             submitLabel="Simpan Tanaman"
