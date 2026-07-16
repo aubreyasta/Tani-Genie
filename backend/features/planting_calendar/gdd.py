@@ -1,0 +1,68 @@
+"""
+gdd.py — the "smart" heat-based layer.
+
+Growing Degree Days = accumulated heat above a crop's base temperature.
+Feeding real daily Tmax/Tmin here gives a harvest date that reacts to weather
+(earlier in a hot spell, later in a cool one) instead of a fixed day count.
+
+Expects a pandas DataFrame with columns T2M_MAX and T2M_MIN (the exact output
+of weather.fetch_nasa_power), indexed by date.
+"""
+
+import datetime as dt
+import math
+
+from .crops import CROPS
+
+
+def daily_gdd(tmax, tmin, tbase, tupper=30.0):
+    """Heat units banked in one day (with the standard high/low cutoffs)."""
+    tmax = min(tmax, tupper)       # no extra credit above ~30 C
+    tmin = max(tmin, tbase)        # nor below the base temperature
+    return max(0.0, (tmax + tmin) / 2.0 - tbase)
+
+
+def add_gdd_columns(weather_df, tbase, tupper=30.0):
+    """Add 'gdd' (per day) and 'gdd_cum' (running total) columns."""
+    df = weather_df.copy()
+    df["gdd"] = [daily_gdd(mx, mn, tbase, tupper)
+                 for mx, mn in zip(df["T2M_MAX"], df["T2M_MIN"])]
+    df["gdd_cum"] = df["gdd"].cumsum()
+    return df
+
+
+def gdd_status(crop_key, planting_date, weather_df, on_date=None):
+    """
+    Weather-adjusted harvest estimate.
+
+    weather_df : daily Tmax/Tmin from planting_date up to on_date.
+    Returns accumulated heat, progress, a projected harvest date that responds
+    to temperature, and the plain-calendar date for comparison.
+    """
+    crop = CROPS[crop_key]
+    tbase = crop["base_temp_c"]
+    target = crop["gdd_to_harvest"]
+    if on_date is None:
+        on_date = weather_df.index.max().date()
+
+    df = add_gdd_columns(weather_df, tbase)
+    accumulated = float(df["gdd"].sum())
+    recent_rate = float(df["gdd"].tail(10).mean())        # heat/day lately
+    remaining = max(0.0, target - accumulated)
+    days_left = math.ceil(remaining / recent_rate) if recent_rate > 0 else None
+
+    projected_harvest = (on_date + dt.timedelta(days=days_left)
+                         if days_left is not None else None)
+    calendar_harvest = planting_date + dt.timedelta(days=crop["days_to_harvest"])
+    diff = ((projected_harvest - calendar_harvest).days
+            if projected_harvest else None)
+
+    return {
+        "accumulated_gdd": round(accumulated),
+        "target_gdd": target,
+        "progress_pct": max(0, min(100, round(accumulated / target * 100))),
+        "recent_gdd_per_day": round(recent_rate, 1),
+        "projected_harvest": projected_harvest,   # weather-adjusted
+        "calendar_harvest": calendar_harvest,      # fixed-day
+        "days_vs_calendar": diff,                  # negative = earlier
+    }

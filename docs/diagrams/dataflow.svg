@@ -1,0 +1,148 @@
+<svg viewBox="0 0 1180 660" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">
+  <defs>
+    <marker id="arw" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L9,5 L0,10 z" fill="#6B5642"/>
+    </marker>
+    <marker id="arwd" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L9,5 L0,10 z" fill="#8a7a63"/>
+    </marker>
+    <style>
+      .title{font-weight:800;font-size:16px;fill:#241C14;letter-spacing:-.3px}
+      .sub{font-weight:500;font-size:11px;fill:#8a7a63}
+      .col{font-weight:800;font-size:12px;fill:#6B5642;letter-spacing:1.2px}
+      .cat{font-weight:700;font-size:9.5px;fill:#9a8a72;letter-spacing:.8px}
+      .bt{font-weight:700;font-size:12px;fill:#241C14}
+      .bs{font-weight:500;font-size:9.5px;fill:#6B5642}
+      .eng{font-weight:700;font-size:12px;fill:#241C14}
+      .engs{font-weight:500;font-size:10px;fill:#4a3d2e}
+      .note{font-weight:600;font-size:10.5px;fill:#8a7a63}
+      .flow{fill:none;stroke-width:1.4;opacity:.5}
+      .flow2{fill:none;stroke:#6B5642;stroke-width:1.8;marker-end:url(#arw)}
+    </style>
+  </defs>
+
+  <text class="title" x="40" y="26">Tanigata — Data Flow</text>
+  <text class="sub" x="196" y="26">how each feature is fed, from raw source to the farmer's screen</text>
+
+  <!-- column headers -->
+  <text class="col" x="145" y="54" text-anchor="middle">DATA SOURCES</text>
+  <text class="col" x="465" y="54" text-anchor="middle">PROCESSING ENGINE</text>
+  <text class="col" x="755" y="54" text-anchor="middle">FEATURES</text>
+  <text class="col" x="1035" y="54" text-anchor="middle">DELIVERY</text>
+
+  <!-- ============ FLOW LINES (drawn first, under boxes) ============ -->
+  <!-- sources -> ingest (465→ left edge 345, target center ~178) -->
+  <path class="flow" stroke="#3E7CA6" d="M250,104 C300,104 300,162 345,162"/>
+  <path class="flow" stroke="#3E7CA6" d="M250,150 C300,150 300,170 345,170"/>
+  <path class="flow" stroke="#3E7CA6" d="M250,196 C300,196 300,178 345,178"/>
+  <path class="flow" stroke="#3E7CA6" d="M250,242 C300,242 300,186 345,186"/>
+  <path class="flow" stroke="#2E8B4F" d="M250,302 C300,302 300,178 345,182"/>
+  <path class="flow" stroke="#2E8B4F" d="M250,348 C300,348 300,190 345,190"/>
+  <path class="flow" stroke="#9B3B6E" d="M250,408 C300,408 300,196 345,196"/>
+  <path class="flow" stroke="#9B3B6E" d="M250,454 C300,454 300,200 345,200"/>
+  <path class="flow" stroke="#E09612" d="M250,522 C305,522 305,204 345,204"/>
+
+  <!-- engine internal -->
+  <path class="flow2" d="M465,206 L465,236"/>
+  <path class="flow2" d="M465,388 L465,418"/>
+
+  <!-- tailoring -> features -->
+  <path class="flow2" d="M585,450 C620,450 615,179 648,179"/>
+  <path class="flow2" d="M585,450 C610,450 615,275 648,275"/>
+  <path class="flow2" d="M585,450 C608,450 620,373 648,373"/>
+  <path class="flow2" d="M585,450 C600,450 620,471 648,471"/>
+
+  <!-- features -> delivery bus (905,300) -->
+  <path class="flow" stroke="#6B5642" d="M860,179 C890,179 890,300 903,300"/>
+  <path class="flow" stroke="#6B5642" d="M860,275 C888,275 888,300 903,300"/>
+  <path class="flow" stroke="#6B5642" d="M860,373 C888,373 888,300 903,300"/>
+  <path class="flow" stroke="#6B5642" d="M860,471 C890,471 890,300 903,300"/>
+  <!-- bus -> channels -->
+  <path class="flow2" d="M907,300 C920,300 918,195 928,195"/>
+  <path class="flow2" d="M907,300 C918,300 918,265 928,265"/>
+  <path class="flow2" d="M907,300 C918,300 918,335 928,335"/>
+  <path class="flow2" d="M907,300 C920,300 918,405 928,405"/>
+
+  <!-- feedback loop -->
+  <path fill="none" stroke="#8a7a63" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arwd)"
+        d="M755,208 L755,616 L145,616 L145,552"/>
+  <text class="note" x="450" y="636" text-anchor="middle">Farmer logs &amp; updates crops → the catalog drives per-crop tailoring across every feature</text>
+
+  <!-- ============ COLUMN A: SOURCES ============ -->
+  <text class="cat" x="40" y="76">CLIMATE &amp; WEATHER</text>
+  <g>
+    <rect x="40" y="84" width="210" height="40" rx="9" fill="#fff" stroke="#E4E6D6"/><rect x="40" y="84" width="4" height="40" rx="2" fill="#3E7CA6"/>
+    <text class="bt" x="56" y="101">BMKG</text><text class="bs" x="56" y="116">village forecast API (temp, rain, wind, RH)</text>
+    <rect x="40" y="130" width="210" height="40" rx="9" fill="#fff" stroke="#E4E6D6"/><rect x="40" y="130" width="4" height="40" rx="2" fill="#3E7CA6"/>
+    <text class="bt" x="56" y="147">NASA POWER</text><text class="bs" x="56" y="162">solar radiation &amp; ET inputs</text>
+    <rect x="40" y="176" width="210" height="40" rx="9" fill="#fff" stroke="#E4E6D6"/><rect x="40" y="176" width="4" height="40" rx="2" fill="#3E7CA6"/>
+    <text class="bt" x="56" y="193">CHIRPS</text><text class="bs" x="56" y="208">satellite rainfall estimates</text>
+    <rect x="40" y="222" width="210" height="40" rx="9" fill="#fff" stroke="#E4E6D6"/><rect x="40" y="222" width="4" height="40" rx="2" fill="#3E7CA6"/>
+    <text class="bt" x="56" y="239">SMAP / ERA5-Land</text><text class="bs" x="56" y="254">soil moisture</text>
+  </g>
+  <text class="cat" x="40" y="278">LAND</text>
+  <g>
+    <rect x="40" y="286" width="210" height="40" rx="9" fill="#fff" stroke="#E4E6D6"/><rect x="40" y="286" width="4" height="40" rx="2" fill="#2E8B4F"/>
+    <text class="bt" x="56" y="303">SoilGrids / IndoSoilFis</text><text class="bs" x="56" y="318">pH, texture, nutrients (by location)</text>
+    <rect x="40" y="332" width="210" height="40" rx="9" fill="#fff" stroke="#E4E6D6"/><rect x="40" y="332" width="4" height="40" rx="2" fill="#2E8B4F"/>
+    <text class="bt" x="56" y="349">Sentinel-2</text><text class="bs" x="56" y="364">NDVI crop vigor (larger plots)</text>
+  </g>
+  <text class="cat" x="40" y="388">PRICES</text>
+  <g>
+    <rect x="40" y="396" width="210" height="40" rx="9" fill="#fff" stroke="#E4E6D6"/><rect x="40" y="396" width="4" height="40" rx="2" fill="#9B3B6E"/>
+    <text class="bt" x="56" y="413">PIHPS — Bank Indonesia</text><text class="bs" x="56" y="428">strategic food prices</text>
+    <rect x="40" y="442" width="210" height="40" rx="9" fill="#fff" stroke="#E4E6D6"/><rect x="40" y="442" width="4" height="40" rx="2" fill="#9B3B6E"/>
+    <text class="bt" x="56" y="459">Panel Harga — Bapanas</text><text class="bs" x="56" y="474">producer / wholesale / retail levels</text>
+  </g>
+  <text class="cat" x="40" y="498">FARMER</text>
+  <g>
+    <rect x="40" y="506" width="210" height="52" rx="9" fill="#FBEED2" stroke="#EBC978"/><rect x="40" y="506" width="4" height="52" rx="2" fill="#E09612"/>
+    <text class="bt" x="56" y="524">Crop catalog</text><text class="bs" x="56" y="539">species, seeds, target yield,</text><text class="bs" x="56" y="551">plot size &amp; location</text>
+  </g>
+
+  <!-- ============ COLUMN B: ENGINE ============ -->
+  <rect x="345" y="150" width="240" height="56" rx="11" fill="#FBFAF4" stroke="#D8D2BF"/>
+  <text class="eng" x="465" y="174" text-anchor="middle">Ingestion &amp; offline cache</text>
+  <text class="engs" x="465" y="191" text-anchor="middle">normalize · store · sync when online</text>
+
+  <rect x="345" y="236" width="240" height="152" rx="11" fill="#FBFAF4" stroke="#D8D2BF"/>
+  <text class="eng" x="465" y="260" text-anchor="middle">Analytics</text>
+  <text class="engs" x="362" y="284">• Agro-stats: GDD, ET0/ETc, water</text>
+  <text class="engs" x="362" y="299">  balance, disease &amp; pest-risk indices</text>
+  <text class="engs" x="362" y="320">• Time-series forecasts:</text>
+  <text class="engs" x="362" y="335">  weather + 8-week price</text>
+  <text class="engs" x="362" y="356">• Land-suitability matcher</text>
+  <text class="engs" x="362" y="371">  (soil ↔ crop requirements)</text>
+
+  <rect x="345" y="420" width="240" height="60" rx="11" fill="#F5E6EE" stroke="#DDB2CC"/>
+  <text class="eng" x="465" y="444" text-anchor="middle" fill="#7a2f58">Tailoring layer</text>
+  <text class="engs" x="465" y="461" text-anchor="middle" fill="#7a2f58">applies per-crop thresholds from catalog</text>
+
+  <!-- ============ COLUMN C: FEATURES ============ -->
+  <rect x="650" y="150" width="210" height="58" rx="11" fill="#F5E6EE" stroke="#DDB2CC"/>
+  <text class="bt" x="665" y="174" fill="#7a2f58">My Farm (Kebunku)</text><text class="bs" x="665" y="191" fill="#7a2f58">crop catalog &amp; plot overview</text>
+
+  <rect x="650" y="238" width="210" height="74" rx="11" fill="#fff" stroke="#E4E6D6"/>
+  <text class="bt" x="665" y="262">1 · Weather + pest</text><text class="bt" x="665" y="278">early warning</text>
+  <text class="bs" x="665" y="298">proactive spray / irrigate / scout</text>
+
+  <rect x="650" y="344" width="210" height="58" rx="11" fill="#fff" stroke="#E4E6D6"/>
+  <text class="bt" x="665" y="368">2 · Price forecasting</text><text class="bs" x="665" y="386">8-week outlook + best sell window</text>
+
+  <rect x="650" y="434" width="210" height="74" rx="11" fill="#fff" stroke="#E4E6D6"/>
+  <text class="bt" x="665" y="458">3 · Planting calendar</text><text class="bt" x="665" y="474">+ input cost</text>
+  <text class="bs" x="665" y="494">stage timeline · modal vs profit</text>
+
+  <!-- ============ COLUMN D: DELIVERY ============ -->
+  <rect x="930" y="168" width="210" height="54" rx="11" fill="#E4EEF4" stroke="#B8D2E1"/>
+  <text class="bt" x="945" y="190">In-app dashboard</text><text class="bs" x="945" y="206">verdict cards, layered detail</text>
+  <rect x="930" y="238" width="210" height="54" rx="11" fill="#E4EEF4" stroke="#B8D2E1"/>
+  <text class="bt" x="945" y="260">WhatsApp bot + alerts</text><text class="bs" x="945" y="276">primary channel in rural areas</text>
+  <rect x="930" y="308" width="210" height="54" rx="11" fill="#E4EEF4" stroke="#B8D2E1"/>
+  <text class="bt" x="945" y="330">SMS / USSD</text><text class="bs" x="945" y="346">basic phones, no-signal zones</text>
+  <rect x="930" y="378" width="210" height="54" rx="11" fill="#E4EEF4" stroke="#B8D2E1"/>
+  <text class="bt" x="945" y="400">Extension-officer view</text><text class="bs" x="945" y="416">penyuluh relays to non-users</text>
+
+  <!-- bus node -->
+  <circle cx="905" cy="300" r="4" fill="#6B5642"/>
+</svg>

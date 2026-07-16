@@ -1,0 +1,115 @@
+<svg viewBox="0 0 1170 476" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">
+  <defs>
+    <style>
+      .title{font-weight:800;font-size:16px;fill:#241C14;letter-spacing:-.3px}
+      .sub{font-weight:500;font-size:11px;fill:#8a7a63}
+      .rl{font-weight:700;font-size:8.5px;fill:#9a8a72;letter-spacing:.7px}
+      .snum{font-weight:800;font-size:11px;fill:#fff}
+      .sname{font-weight:800;font-size:12px;fill:#241C14}
+      .ew{font-weight:700;font-size:9.5px;fill:#6B5642}
+      .cell{font-weight:500;font-size:9.7px;fill:#3d3323}
+      .cellb{font-weight:700;font-size:9.7px;fill:#241C14}
+      .chip{font-weight:700;font-size:9px}
+      .foot{font-weight:600;font-size:10px;fill:#8a7a63}
+      .sep{stroke:#E4E6D6;stroke-width:1}
+    </style>
+  </defs>
+
+  <text class="title" x="20" y="26">Tanigata — User Journey</text>
+  <text class="sub" x="215" y="26">Pak Tarno, a shallot &amp; chili farmer in Brebes, across one cycle with the core features</text>
+
+  <!-- row labels -->
+  <text class="rl" x="20" y="150">EMOTION</text>
+  <text class="rl" x="20" y="238">DOING</text>
+  <text class="rl" x="20" y="300">TOUCHPOINT</text>
+  <text class="rl" x="20" y="342">SEEING</text>
+  <text class="rl" x="20" y="404">SO WE DESIGN…</text>
+
+  <!-- column separators -->
+  <line class="sep" x1="150" y1="92" x2="150" y2="430"/>
+  <line class="sep" x1="318" y1="92" x2="318" y2="430"/>
+  <line class="sep" x1="486" y1="92" x2="486" y2="430"/>
+  <line class="sep" x1="654" y1="92" x2="654" y2="430"/>
+  <line class="sep" x1="822" y1="92" x2="822" y2="430"/>
+  <line class="sep" x1="990" y1="92" x2="990" y2="430"/>
+  <line class="sep" x1="1158" y1="92" x2="1158" y2="430"/>
+
+  <!-- stage headers -->
+  <g>
+    <circle cx="166" cy="62" r="10" fill="#9B3B6E"/><text class="snum" x="166" y="66" text-anchor="middle">1</text>
+    <text class="sname" x="184" y="66">Log my crops</text>
+    <circle cx="334" cy="62" r="10" fill="#9B3B6E"/><text class="snum" x="334" y="66" text-anchor="middle">2</text>
+    <text class="sname" x="352" y="66">Morning check</text>
+    <circle cx="502" cy="62" r="10" fill="#3E7CA6"/><text class="snum" x="502" y="66" text-anchor="middle">3</text>
+    <text class="sname" x="520" y="66">Protect the crop</text>
+    <circle cx="670" cy="62" r="10" fill="#2E8B4F"/><text class="snum" x="670" y="66" text-anchor="middle">4</text>
+    <text class="sname" x="688" y="66">Watch the price</text>
+    <circle cx="838" cy="62" r="10" fill="#2E8B4F"/><text class="snum" x="838" y="66" text-anchor="middle">5</text>
+    <text class="sname" x="856" y="66">Sell at right time</text>
+    <circle cx="1006" cy="62" r="10" fill="#E09612"/><text class="snum" x="1006" y="66" text-anchor="middle">6</text>
+    <text class="sname" x="1024" y="66">Plan next cycle</text>
+  </g>
+
+  <!-- emotion curve band (y 100=high .. 190=low) -->
+  <path d="M234,150 C300,140 320,135 402,135 C470,140 500,168 570,168 C640,140 680,120 738,120 C800,105 838,100 906,100 C980,102 1000,108 1074,108"
+        fill="none" stroke="#DDB2CC" stroke-width="2.4" stroke-linecap="round"/>
+  <g font-size="17" text-anchor="middle">
+    <text x="234" y="126">🤔</text><circle cx="234" cy="150" r="4.5" fill="#9B3B6E"/><text class="ew" x="234" y="176" text-anchor="middle">Curious</text>
+    <text x="402" y="126">🙂</text><circle cx="402" cy="135" r="4.5" fill="#9B3B6E"/><text class="ew" x="402" y="161" text-anchor="middle">Oriented</text>
+    <text x="570" y="126">😟</text><circle cx="570" cy="168" r="4.5" fill="#3E7CA6"/><text class="ew" x="570" y="192" text-anchor="middle">Worried → relieved</text>
+    <text x="738" y="112">😀</text><circle cx="738" cy="120" r="4.5" fill="#2E8B4F"/><text class="ew" x="738" y="146" text-anchor="middle">Hopeful</text>
+    <text x="906" y="92">😎</text><circle cx="906" cy="100" r="4.5" fill="#2E8B4F"/><text class="ew" x="906" y="126" text-anchor="middle">Confident</text>
+    <text x="1074" y="100">💪</text><circle cx="1074" cy="108" r="4.5" fill="#E09612"/><text class="ew" x="1074" y="134" text-anchor="middle">In control</text>
+  </g>
+
+  <line class="sep" x1="150" y1="206" x2="1158" y2="206"/>
+
+  <!-- DOING -->
+  <g text-anchor="middle">
+    <text class="cell" x="234" y="232">Logs crop, seeds,</text><text class="cell" x="234" y="246">target, plot size</text>
+    <text class="cell" x="402" y="232">Opens app, or gets</text><text class="cell" x="402" y="246">a WhatsApp ping</text>
+    <text class="cell" x="570" y="232">Reads pest + water</text><text class="cell" x="570" y="246">alert; plans spray</text>
+    <text class="cell" x="738" y="232">Checks price and</text><text class="cell" x="738" y="246">8-week forecast</text>
+    <text class="cell" x="906" y="232">Harvests chili in</text><text class="cell" x="906" y="246">batches; holds shallots</text>
+    <text class="cell" x="1074" y="232">Reviews profit;</text><text class="cell" x="1074" y="246">logs next crop</text>
+  </g>
+
+  <line class="sep" x1="150" y1="258" x2="1158" y2="258"/>
+
+  <!-- TOUCHPOINT chips -->
+  <g>
+    <rect x="176" y="278" width="116" height="22" rx="11" fill="#F5E6EE"/><text class="chip" x="234" y="293" text-anchor="middle" fill="#7a2f58">Kebunku (catalog)</text>
+    <rect x="346" y="278" width="112" height="22" rx="11" fill="#F5E6EE"/><text class="chip" x="402" y="293" text-anchor="middle" fill="#7a2f58">Beranda + alerts</text>
+    <rect x="512" y="278" width="116" height="22" rx="11" fill="#E4EEF4"/><text class="chip" x="570" y="293" text-anchor="middle" fill="#2f6588">Cuaca + hama</text>
+    <rect x="686" y="278" width="104" height="22" rx="11" fill="#E4F1E8"/><text class="chip" x="738" y="293" text-anchor="middle" fill="#1f6e3d">Harga</text>
+    <rect x="848" y="278" width="116" height="22" rx="11" fill="#E4F1E8"/><text class="chip" x="906" y="293" text-anchor="middle" fill="#1f6e3d">Harga (+ pembeli)</text>
+    <rect x="1012" y="278" width="124" height="22" rx="11" fill="#FBEED2"/><text class="chip" x="1074" y="293" text-anchor="middle" fill="#9a6a06">Kalender + biaya</text>
+  </g>
+
+  <line class="sep" x1="150" y1="312" x2="1158" y2="312"/>
+
+  <!-- SEEING -->
+  <g text-anchor="middle">
+    <text class="cellb" x="234" y="336">Simple form →</text><text class="cell" x="234" y="350">2 plots appear</text>
+    <text class="cellb" x="402" y="336">“2 hal perlu</text><text class="cellb" x="402" y="350">perhatian”</text>
+    <text class="cellb" x="570" y="336">“Risiko antraknosa</text><text class="cell" x="570" y="350">tinggi” · jam semprot</text>
+    <text class="cellb" x="738" y="336">Rising line +</text><text class="cellb" x="738" y="350">“jual sekitar…”</text>
+    <text class="cell" x="906" y="336">Sell-now nudge</text><text class="cell" x="906" y="350">confirms timing</text>
+    <text class="cell" x="1074" y="336">Stage timeline;</text><text class="cell" x="1074" y="350">modal vs untung</text>
+  </g>
+
+  <line class="sep" x1="150" y1="362" x2="1158" y2="362"/>
+
+  <!-- DESIGN CUE -->
+  <g text-anchor="middle">
+    <text class="cell" x="234" y="384">Almost no typing.</text><text class="cell" x="234" y="398">Instant payoff so it</text><text class="cell" x="234" y="412">feels worth doing.</text>
+    <text class="cell" x="402" y="384">Verdict first. Works</text><text class="cell" x="402" y="398">offline. Readable</text><text class="cell" x="402" y="412">in one glance.</text>
+    <text class="cell" x="570" y="384">One clear action per</text><text class="cell" x="570" y="398">alert. Tailored to</text><text class="cell" x="570" y="412">this exact crop.</text>
+    <text class="cell" x="738" y="384">Show uncertainty</text><text class="cell" x="738" y="398">honestly. One clear</text><text class="cell" x="738" y="412">sell window.</text>
+    <text class="cell" x="906" y="384">The trust payoff —</text><text class="cell" x="906" y="398">make the moment</text><text class="cell" x="906" y="412">feel earned.</text>
+    <text class="cell" x="1074" y="384">Close the loop. Cost</text><text class="cell" x="1074" y="398">calc informs the</text><text class="cell" x="1074" y="412">next decision.</text>
+  </g>
+
+  <line class="sep" x1="150" y1="424" x2="1158" y2="424"/>
+  <text class="foot" x="20" y="452">The dip at stage 3 (the pest scare) is where the product proves itself; the peak at stage 5 (selling at the right price) is the payoff that turns a user into a daily one.</text>
+</svg>
