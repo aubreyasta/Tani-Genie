@@ -1,0 +1,20 @@
+{
+  "name": "Tanigata — Teman Tani Indonesia",
+  "short_name": "Tanigata",
+  "description": "Pendamping keputusan iklim dan harga untuk petani kecil Indonesia",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0a0a0a",
+  "lang": "id",
+  "orientation": "portrait-primary",
+  "categories": ["agriculture", "productivity"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

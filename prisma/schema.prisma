@@ -1,0 +1,160 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Farmer {
+  id        String   @id @default(uuid())
+  name      String
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  plots     Plot[]
+  notifications Notification[]
+}
+
+model CropDefinition {
+  id            String  @id @default(uuid())
+  slug          String  @unique
+  name          String
+  commodityKey  String  @unique
+  minTempC      Float
+  maxTempC      Float
+  minHumidity   Float
+  maxHumidity   Float
+  waterNeedMm  Float
+  gddBaseC     Float
+  gddTargetC   Float
+  pestRiskHumidity Float
+  pestRiskTempC   Float
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  plantings     PlantingCycle[]
+}
+
+model Plot {
+  id          String   @id @default(uuid())
+  farmerId    String
+  name        String
+  areaM2      Float
+  latitude    Float
+  longitude   Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  farmer      Farmer   @relation(fields: [farmerId], references: [id], onDelete: Cascade)
+  plantings   PlantingCycle[]
+  @@index([farmerId])
+}
+
+model PlantingCycle {
+  id              String   @id @default(uuid())
+  plotId          String
+  cropId          String
+  seedName        String
+  targetYieldKg   Float
+  plantedAt       DateTime
+  expectedHarvestAt DateTime
+  status          String   @default("active")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  plot            Plot             @relation(fields: [plotId], references: [id], onDelete: Cascade)
+  crop            CropDefinition   @relation(fields: [cropId], references: [id])
+  weatherSnapshots WeatherSnapshot[]
+  pestAlerts      PestAlert[]
+  priceForecasts  PriceForecastPoint[]
+  notifications   Notification[]
+  @@index([plotId])
+  @@index([cropId])
+  @@index([status])
+}
+
+model WeatherSnapshot {
+  id              String   @id @default(uuid())
+  plantingId      String
+  observedAt      DateTime
+  temperatureC    Float
+  rainfallMm      Float
+  humidityPct     Float
+  windSpeedKmh    Float
+  source          String   @default("BMKG-village-forecast")
+  createdAt       DateTime @default(now())
+  planting        PlantingCycle @relation(fields: [plantingId], references: [id], onDelete: Cascade)
+  @@index([plantingId, observedAt])
+}
+
+model PestAlert {
+  id          String   @id @default(uuid())
+  plantingId  String
+  alertType   String
+  severity    String
+  verdict     String
+  action      String
+  reason      String
+  observedAt  DateTime
+  createdAt   DateTime @default(now())
+  planting    PlantingCycle @relation(fields: [plantingId], references: [id], onDelete: Cascade)
+  @@index([plantingId, observedAt])
+}
+
+model PriceObservation {
+  id            String   @id @default(uuid())
+  commodityKey  String
+  pricePerKg    Decimal  @db.Decimal(12, 2)
+  level         String
+  observedAt    DateTime
+  source        String   @default("Panel-Harga-Bapanas")
+  createdAt     DateTime @default(now())
+  @@index([commodityKey, observedAt])
+}
+
+model PriceForecastPoint {
+  id            String   @id @default(uuid())
+  plantingId    String
+  weekNumber    Int
+  expectedPrice Decimal  @db.Decimal(12, 2)
+  lowerBound    Decimal  @db.Decimal(12, 2)
+  upperBound    Decimal  @db.Decimal(12, 2)
+  isBestSell    Boolean  @default(false)
+  generatedAt   DateTime
+  source        String   @default("tanigata-deterministic")
+  createdAt     DateTime @default(now())
+  planting      PlantingCycle @relation(fields: [plantingId], references: [id], onDelete: Cascade)
+  @@unique([plantingId, weekNumber])
+  @@index([plantingId])
+}
+
+model Notification {
+  id          String   @id @default(uuid())
+  farmerId    String
+  plantingId  String?
+  type        String
+  priority    String
+  title       String
+  body        String
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  readAt      DateTime?
+  farmer      Farmer   @relation(fields: [farmerId], references: [id], onDelete: Cascade)
+  planting    PlantingCycle? @relation(fields: [plantingId], references: [id])
+  deliveries  DeliveryAttempt[]
+  @@index([farmerId, isRead])
+  @@index([createdAt])
+}
+
+model DeliveryAttempt {
+  id            String   @id @default(uuid())
+  notificationId String
+  channel       String
+  status        String   @default("queued")
+  payloadPreview String
+  attemptedAt   DateTime @default(now())
+  deliveredAt   DateTime?
+  errorMessage  String?
+  notification  Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  @@index([notificationId])
+  @@index([status])
+}
