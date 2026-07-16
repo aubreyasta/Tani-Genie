@@ -1,12 +1,9 @@
 """
-tanigata_calendar — planting-calendar feature.
-
-Public API:
-    plant_dashboard(...)   one call -> everything the UI needs
-    list_crops()           available crops
-    estimate_cost(...)     cost/profit only
-    get_status(...)        calendar status only
-    rupiah(n)              format Rupiah
+plant_dashboard(...)   one call -> everything the UI needs
+list_crops()           available crops
+estimate_cost(...)     cost/profit only
+get_status(...)        calendar status only
+rupiah(n)              format Rupiah
 """
 
 from .crops import CROPS, list_crops

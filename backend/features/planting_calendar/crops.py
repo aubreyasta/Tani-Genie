@@ -1,27 +1,14 @@
 """
-crops.py — the crop knowledge base.
-
-This is the single source of truth for everything the feature needs about a
-crop: its growth stages, dated tasks, GDD parameters, and the inputs used by
-the cost calculator.
-
-Citation tags [A#]/[B#]/[G#] map to SOURCES.md.
-
-TWO honesty notes carried from research:
-  * gdd_to_harvest values are CALIBRATED estimates, not field-measured.
-  * cost `inputs` quantities are researched where possible, but the PRICES are
-    ILLUSTRATIVE DEFAULTS (Rp) — replace with real / subsidized prices, and
-    feed the live sell price from PIHPS for revenue.
+crop knowledge base. Citation tags [A#]/[B#]/[G#] map to SOURCES.md.
 """
 
 CROPS = {
-    # ==================================================================== #
     "bawang_merah": {
         "display_name": "Bawang Merah",
         "day_zero": "tanam",
         "days_to_harvest": 60,
-        "base_temp_c": 4,          # cool-season allium ~4 C [G2]
-        "gdd_to_harvest": 1350,    # CALIBRATED estimate, not field-measured
+        "base_temp_c": 4,         
+        "gdd_to_harvest": 1350,
         "stages": [
             {"name": "Tanam & tumbuh awal", "start": 0,  "end": 20},
             {"name": "Vegetatif",           "start": 21, "end": 35},
@@ -35,10 +22,8 @@ CROPS = {
             {"day": 50, "label": "Kurangi penyiraman jelang panen"},          # [A2]
             {"day": 58, "label": "Panen (70-80% daun rebah)"},                # 55-65 HST [A1][A2]
         ],
-        # ---- cost inputs (per hectare) -------------------------------- #
         "cost": {
             "inputs": [
-                # name, category, qty per ha, unit, default price/unit (Rp)
                 {"name": "Bibit umbi",   "category": "bibit", "qty_per_ha": 1000, "unit": "kg", "price_per_unit": 35000},  # [A2]
                 {"name": "Pupuk kandang","category": "pupuk", "qty_per_ha": 5000, "unit": "kg", "price_per_unit": 1000},   # [A2]
                 {"name": "NPK",          "category": "pupuk", "qty_per_ha": 200,  "unit": "kg", "price_per_unit": 9000},   # [A2]
@@ -48,18 +33,17 @@ CROPS = {
                 {"name": "KCl",          "category": "pupuk", "qty_per_ha": 150,  "unit": "kg", "price_per_unit": 12000},  # [A1]
                 {"name": "Dolomit",      "category": "pupuk", "qty_per_ha": 1500, "unit": "kg", "price_per_unit": 1000},   # [A2]
             ],
-            "labor_per_ha": 15000000,      # lump estimate (Rp/ha) — refine
-            "yield_kg_per_ha": 10000,      # ~10 t/ha typical
+            "labor_per_ha": 15000000,      
+            "yield_kg_per_ha": 10000,     
         },
         "source": "fertilizer [A1][A3], budidaya/rates [A2], base temp [G2] — see SOURCES.md",
     },
-    # ==================================================================== #
     "cabai_rawit": {
         "display_name": "Cabai Rawit",
         "day_zero": "semai",
-        "days_to_harvest": 90,     # to FIRST harvest, then periodic
-        "base_temp_c": 10,         # warm-season, pepper ~10 C [G2]
-        "gdd_to_harvest": 1485,    # CALIBRATED estimate
+        "days_to_harvest": 90,  
+        "base_temp_c": 10,        
+        "gdd_to_harvest": 1485,  
         "stages": [
             {"name": "Semai",              "start": 0,  "end": 21},
             {"name": "Vegetatif",          "start": 22, "end": 45},
@@ -76,14 +60,14 @@ CROPS = {
         ],
         "cost": {
             "inputs": [
-                {"name": "Bibit / benih", "category": "bibit", "qty_per_ha": 18000, "unit": "batang", "price_per_unit": 300},   # ~18k plants/ha [B1]
+                {"name": "Bibit / benih", "category": "bibit", "qty_per_ha": 18000, "unit": "batang", "price_per_unit": 300},   
                 {"name": "Pupuk kandang", "category": "pupuk", "qty_per_ha": 10000, "unit": "kg", "price_per_unit": 1000},
                 {"name": "NPK dasar",     "category": "pupuk", "qty_per_ha": 700,   "unit": "kg", "price_per_unit": 9000},       # 700 kg/ha [B1]
                 {"name": "NPK susulan",   "category": "pupuk", "qty_per_ha": 300,   "unit": "kg", "price_per_unit": 9000},       # [B4]
                 {"name": "Mulsa plastik", "category": "lain",  "qty_per_ha": 1,     "unit": "paket", "price_per_unit": 4000000},
                 {"name": "Ajir bambu",    "category": "lain",  "qty_per_ha": 1,     "unit": "paket", "price_per_unit": 3000000},
             ],
-            "labor_per_ha": 25000000,      # long season + repeated harvest
+            "labor_per_ha": 25000000, 
             "yield_kg_per_ha": 8000,
         },
         "source": "susulan/harvest [B1], budidaya [B2], harvest window [B3], fert-by-phase [B4], base temp [G2] — see SOURCES.md",
@@ -94,7 +78,7 @@ CROPS = {
         "day_zero": "tanam",
         "days_to_harvest": 115,
         "base_temp_c": 10,         # rice 10-12 C [G1][G2]
-        "gdd_to_harvest": 1900,    # CALIBRATED estimate
+        "gdd_to_harvest": 1900,
         "stages": [
             {"name": "Vegetatif",   "start": 0,   "end": 60},
             {"name": "Reproduktif", "start": 61,  "end": 95},
@@ -118,13 +102,13 @@ CROPS = {
         },
         "source": "base temp [G1][G2]; STAGE DURATIONS & costs are general reference — VERIFY",
     },
-    # ==================================================================== #
+
     "jagung": {
         "display_name": "Jagung",
         "day_zero": "tanam",
         "days_to_harvest": 100,
         "base_temp_c": 10,         # maize 10 C [G1][G3][G4]
-        "gdd_to_harvest": 1500,    # CALIBRATED estimate
+        "gdd_to_harvest": 1500,   
         "stages": [
             {"name": "Vegetatif",      "start": 0,  "end": 45},
             {"name": "Berbunga",       "start": 46, "end": 65},
@@ -152,5 +136,4 @@ CROPS = {
 
 
 def list_crops():
-    """Return the crop keys and their display names."""
     return {k: v["display_name"] for k, v in CROPS.items()}

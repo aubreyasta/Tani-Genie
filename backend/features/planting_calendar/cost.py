@@ -1,11 +1,4 @@
 """
-cost.py — input-cost & profit calculator.
-
-Uses each crop's `cost` block (inputs per hectare, labor, expected yield),
-scales it to the farmer's plot size, and — if a sell price is given — estimates
-revenue and profit.
-
-Price handling:
   * Input prices default to the (illustrative) values in crops.py.
   * Pass `price_overrides={"Urea": 2250, ...}` to use real / subsidized prices.
   * Pass `sell_price_per_kg` (e.g. from PIHPS) to get revenue and profit.
@@ -15,13 +8,9 @@ from .crops import CROPS
 
 
 def estimate_cost(crop_key, plot_ha, price_overrides=None, sell_price_per_kg=None):
-    """
-    Returns a breakdown dict. All money values are in Rupiah.
-    """
     cost = CROPS[crop_key]["cost"]
     price_overrides = price_overrides or {}
 
-    # --- itemised inputs, scaled to plot size ---
     items = []
     by_category = {}
     for inp in cost["inputs"]:

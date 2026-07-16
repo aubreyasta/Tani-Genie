@@ -1,7 +1,4 @@
 """
-dashboard.py — the one function the app/UI calls.
-
-plant_dashboard() bundles everything for the "Kalender + biaya" screen:
   * the plain calendar + current status (stage, progress, next task)
   * the weather-adjusted harvest estimate (GDD), if a location is given
   * the input-cost breakdown, plus profit if a sell price is given
@@ -20,8 +17,6 @@ def plant_dashboard(crop_key, planting_date, plot_ha,
                     sell_price_per_kg=None, price_overrides=None,
                     on_date=None, allow_synthetic=True):
     """
-    Build the full feature payload for one planted crop.
-
     Required: crop_key, planting_date (date), plot_ha (float).
     Optional: lat/lon (enables the GDD harvest estimate),
               sell_price_per_kg (enables revenue/profit),
@@ -41,12 +36,11 @@ def plant_dashboard(crop_key, planting_date, plot_ha,
         "weather_source": None,
     }
 
-    # GDD needs a location to pull temperatures for.
     if lat is not None and lon is not None:
         wx, source = get_temperature(lat, lon, planting_date, on_date,
                                      allow_synthetic=allow_synthetic)
         payload["weather_source"] = source
-        # only use weather up to today (POWER may return a few extra rows)
+        
         wx = wx[wx.index.date <= on_date]
         if len(wx):
             payload["gdd"] = gdd_status(crop_key, planting_date, wx, on_date)

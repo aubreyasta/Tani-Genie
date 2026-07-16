@@ -1,9 +1,4 @@
-"""
-calendar_calc.py — the plain calendar (no weather).
-
-Turns the crop knowledge base + a planting date into a dated timeline,
-and reports the current status. Pure date arithmetic.
-"""
+"""plain calendar"""
 
 import datetime as dt
 
@@ -11,7 +6,6 @@ from .crops import CROPS
 
 
 def build_calendar(crop_key, planting_date):
-    """Full dated calendar: each stage and task as real dates."""
     crop = CROPS[crop_key]
 
     def day_to_date(n):
@@ -37,7 +31,6 @@ def build_calendar(crop_key, planting_date):
 
 
 def get_status(crop_key, planting_date, on_date=None):
-    """Where are we on `on_date` (default today): stage, progress, next task."""
     crop = CROPS[crop_key]
     if on_date is None:
         on_date = dt.date.today()
