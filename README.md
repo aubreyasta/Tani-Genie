@@ -58,7 +58,6 @@ Aplikasi menggunakan data dummy deterministik:
 1. **Kebunku** (/kebunku) — Manajemen lahan dan tanaman
 2. **Peringatan** (/peringatan) — Verdict cuaca dan hama per tanaman
 3. **Harga** (/harga) — Prakiraan harga 8 minggu dengan jendela jual terbaik
-4. **Notifikasi** (/notifikasi) — Notifikasi + pengiriman mock WhatsApp/SMS
 
 Kebunku juga dapat menyimpan sumber data point per tanaman (`api` atau `iot`) dan menampilkan
 hasil dari service planting calendar serta price prediction bila kedua service Python aktif.
