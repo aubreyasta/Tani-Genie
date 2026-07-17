@@ -36,7 +36,7 @@ const weatherInsight = {
 };
 
 const forecast = {
-  points: [{ weekNumber: 3, expectedPrice: 50_000, isBestSell: true }],
+  points: [{ targetDate: '2026-07-24', horizonDays: 7, predictedPrice: 50_000, isBestSell: true }],
 };
 
 function notification(id: string, type: string) {

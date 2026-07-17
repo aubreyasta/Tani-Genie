@@ -47,7 +47,6 @@ Buka http://localhost:3000
 
 Aplikasi menggunakan data dummy deterministik:
 
-- **Petani**: Pak Budi
 - **Komoditas**: Cabai Merah, Bawang Merah
 - **Lahan**: 2 plot (Kebun Cabai, Lahan Bawang)
 - **Cuaca**: Fixture berbasis koordinat (bukan data BMKG langsung)
@@ -61,12 +60,42 @@ Aplikasi menggunakan data dummy deterministik:
 3. **Harga** (/harga) — Prakiraan harga 8 minggu dengan jendela jual terbaik
 4. **Notifikasi** (/notifikasi) — Notifikasi + pengiriman mock WhatsApp/SMS
 
+Kebunku juga dapat menyimpan sumber data point per tanaman (`api` atau `iot`) dan menampilkan
+hasil dari service planting calendar serta price prediction bila kedua service Python aktif.
+
+## Service Integrasi
+
+Jalankan service Python di terminal terpisah:
+
+```bash
+# Price prediction
+cd tani-genie-price-prediction
+uvicorn api.main:app --port 8000
+
+# Planting calendar
+cd tani-genie-planting-calendar/backend
+uvicorn app.main:app --port 8001
+```
+
+Atur URL service di `.env`:
+
+```bash
+PRICE_PREDICTION_API_URL=http://localhost:8000
+PLANTING_CALENDAR_API_URL=http://localhost:8001
+PRICE_PREDICTION_MARKET=pasar_tradisional
+PRICE_PREDICTION_PROVINCE="DI Yogyakarta"
+```
+
+Jika service Python tidak aktif, CRUD tanaman tetap berjalan dan hasil integrasi ditampilkan sebagai
+belum tersedia.
+
 ## API Endpoints
 
 | Method | Endpoint | Deskripsi |
 |--------|----------|-----------|
 | GET | /api/health | Status aplikasi + database |
 | GET | /api/crops | Daftar komoditas |
+| POST | /api/crops | Tambah definisi komoditas |
 | GET | /api/plots | Daftar lahan |
 | POST | /api/plots | Tambah lahan |
 | GET | /api/plots/[id] | Detail lahan |
@@ -74,6 +103,7 @@ Aplikasi menggunakan data dummy deterministik:
 | DELETE | /api/plots/[id] | Hapus lahan |
 | GET | /api/plantings | Daftar tanaman (?plotId=) |
 | POST | /api/plantings | Tambah tanaman |
+| GET | /api/plantings/[id]/integrations | Kalender tanam + prediksi harga eksternal |
 | GET | /api/insights/weather | Verdict cuaca (?plantingId=) |
 | POST | /api/insights/weather/refresh | Segarkan data cuaca |
 | GET | /api/forecasts/prices | Prakiraan harga (?plantingId=) |

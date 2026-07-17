@@ -1,17 +1,30 @@
 import { ConflictError, NotFoundError, ValidationError } from '@/lib/errors';
 import { prisma } from '@/lib/prisma';
-import type { CropDto, FarmerDto, PlantingDto, PlotDto } from '@/types/api';
+import type { CropDto, DataPointMapping, FarmerDto, PlantingDto, PlotDto } from '@/types/api';
+import { CROP_PRESETS } from './crop-presets';
 
 export class CatalogService {
   async getDefaultFarmer(): Promise<FarmerDto> {
-    const farmer = await prisma.farmer.findFirst({ orderBy: { createdAt: 'asc' } });
-    if (!farmer) {
-      throw new NotFoundError('Petani', 'default');
-    }
+    const farmer =
+      (await prisma.farmer.findFirst({ orderBy: { createdAt: 'asc' } })) ??
+      (await prisma.farmer.upsert({
+        where: { id: 'default-farmer' },
+        update: {},
+        create: { id: 'default-farmer', name: 'Petani' },
+      }));
     return { id: farmer.id, name: farmer.name, phone: farmer.phone };
   }
 
   async listCrops(): Promise<ReadonlyArray<CropDto>> {
+    await Promise.all(
+      Object.entries(CROP_PRESETS).map(([slug, preset]) =>
+        prisma.cropDefinition.upsert({
+          where: { slug },
+          update: { ...preset, commodityKey: slug },
+          create: { ...preset, slug, commodityKey: slug },
+        }),
+      ),
+    );
     const crops = await prisma.cropDefinition.findMany({ orderBy: { name: 'asc' } });
     return crops.map(toCropDto);
   }
@@ -21,6 +34,18 @@ export class CatalogService {
     if (!crop) {
       throw new NotFoundError('Komoditas', id);
     }
+    return toCropDto(crop);
+  }
+
+  async createCrop(data: Omit<CropDto, 'id'>): Promise<CropDto> {
+    const existing = await prisma.cropDefinition.findFirst({
+      where: { OR: [{ slug: data.slug }, { commodityKey: data.commodityKey }] },
+      select: { id: true },
+    });
+    if (existing) {
+      throw new ConflictError(`Komoditas ${data.name} sudah tersedia`);
+    }
+    const crop = await prisma.cropDefinition.create({ data });
     return toCropDto(crop);
   }
 
@@ -114,6 +139,7 @@ export class CatalogService {
     readonly targetYieldKg: number;
     readonly plantedAt: Date;
     readonly expectedHarvestAt: Date;
+    readonly dataPoints: DataPointMapping;
   }): Promise<PlantingDto> {
     validateHarvestDates(data.plantedAt, data.expectedHarvestAt);
     const activePlantings = await prisma.plantingCycle.count({
@@ -124,8 +150,9 @@ export class CatalogService {
         'Lahan masih memiliki tanaman aktif. Selesaikan tanaman saat ini terlebih dahulu.',
       );
     }
+    const dataPoints = { temp: 'api' as const, ...data.dataPoints };
     const planting = await prisma.plantingCycle.create({
-      data,
+      data: { ...data, dataPoints },
       include: { crop: { select: { name: true } } },
     });
     return toPlantingDto(planting);
@@ -141,6 +168,7 @@ export class CatalogService {
       readonly plantedAt: Date;
       readonly expectedHarvestAt: Date;
       readonly status: 'active' | 'finished' | 'planned';
+      readonly dataPoints: DataPointMapping;
     }>,
   ): Promise<PlantingDto> {
     const current = await this.getPlanting(id);
@@ -148,9 +176,13 @@ export class CatalogService {
       data.plantedAt ?? new Date(current.plantedAt),
       data.expectedHarvestAt ?? new Date(current.expectedHarvestAt),
     );
+    const { dataPoints, ...fields } = data;
     const planting = await prisma.plantingCycle.update({
       where: { id },
-      data,
+      data: {
+        ...fields,
+        ...(dataPoints ? { dataPoints: { ...dataPoints } } : {}),
+      },
       include: { crop: { select: { name: true } } },
     });
     return toPlantingDto(planting);
@@ -203,6 +235,7 @@ function toPlantingDto(row: {
   readonly plantedAt: Date;
   readonly expectedHarvestAt: Date;
   readonly status: string;
+  readonly dataPoints: unknown;
   readonly crop: { readonly name: string };
 }): PlantingDto {
   return {
@@ -215,5 +248,21 @@ function toPlantingDto(row: {
     plantedAt: row.plantedAt.toISOString(),
     expectedHarvestAt: row.expectedHarvestAt.toISOString(),
     status: row.status as PlantingDto['status'],
+    dataPoints: toDataPointMapping(row.dataPoints),
   };
+}
+
+function toDataPointMapping(value: unknown): DataPointMapping {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return {};
+  }
+
+  const mapping: DataPointMapping = {};
+  for (const key of ['temp', 'humidity', 'rainfall', 'soil_moisture', 'nutrients_ph'] as const) {
+    const source = Reflect.get(value, key);
+    if (source === 'api' || source === 'iot') {
+      mapping[key] = source;
+    }
+  }
+  return mapping;
 }

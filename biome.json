@@ -78,6 +78,16 @@
           }
         }
       }
+    },
+    {
+      "includes": ["src/modules/integrations/**/*.ts"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "useLiteralKeys": "off"
+          }
+        }
+      }
     }
   ]
 }

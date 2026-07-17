@@ -18,6 +18,7 @@ function toPlantingUpdateData(data: {
   readonly plantedAt?: string | undefined;
   readonly expectedHarvestAt?: string | undefined;
   readonly status?: 'active' | 'finished' | 'planned' | undefined;
+  readonly dataPoints?: import('@/types/api').DataPointMapping | undefined;
 }) {
   return {
     ...(data.plotId !== undefined ? { plotId: data.plotId } : {}),
@@ -29,6 +30,7 @@ function toPlantingUpdateData(data: {
       ? { expectedHarvestAt: new Date(data.expectedHarvestAt) }
       : {}),
     ...(data.status !== undefined ? { status: data.status } : {}),
+    ...(data.dataPoints !== undefined ? { dataPoints: data.dataPoints } : {}),
   };
 }
 

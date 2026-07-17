@@ -4,7 +4,8 @@ import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { apiGet, formatDate, formatNumber } from '@/lib/ui-data';
-import type { CropDto, PlantingDto, PlotDto } from '@/types/api';
+import type { CropDto, PlantingDto, PlantingIntegrationDto, PlotDto } from '@/types/api';
+import type { WeatherInsightDto } from '@/types/ui';
 
 export default async function KebunkuPage() {
   const [plots, plantings, crops] = await Promise.all([
@@ -13,6 +14,33 @@ export default async function KebunkuPage() {
     apiGet<ReadonlyArray<CropDto>>('/api/crops'),
   ]);
   const activeCount = plantings.filter((planting) => planting.status === 'active').length;
+  const integrationEntries = await Promise.all(
+    plantings
+      .filter((planting) => planting.status === 'active')
+      .map(
+        async (planting) =>
+          [
+            planting.id,
+            await apiGet<PlantingIntegrationDto>(`/api/plantings/${planting.id}/integrations`),
+          ] as const,
+      ),
+  );
+  const integrations = new Map(integrationEntries);
+  const apiTemperaturePlantings = plantings.filter(
+    (planting) => planting.status === 'active' && planting.dataPoints.temp === 'api',
+  );
+  const weatherResults = await Promise.allSettled(
+    apiTemperaturePlantings.map((planting) =>
+      apiGet<WeatherInsightDto>(`/api/insights/weather?plantingId=${planting.id}`),
+    ),
+  );
+  const temperatures = new Map(
+    weatherResults.flatMap((result) =>
+      result.status === 'fulfilled'
+        ? [[result.value.planting.id, result.value.weather] as const]
+        : [],
+    ),
+  );
 
   return (
     <div className="page-shell stack">
@@ -26,7 +54,9 @@ export default async function KebunkuPage() {
         </p>
       </section>
 
-      <AddPlotPanel />
+      <div className="actions">
+        <AddPlotPanel />
+      </div>
 
       {plots.length === 0 ? (
         <EmptyState message="Belum ada lahan. Mulai dengan menambah petak kebun." />
@@ -36,6 +66,8 @@ export default async function KebunkuPage() {
         {plots.map((plot) => {
           const plotPlantings = plantings.filter((planting) => planting.plotId === plot.id);
           const activePlanting = plotPlantings.find((planting) => planting.status === 'active');
+          const integration = activePlanting ? integrations.get(activePlanting.id) : null;
+          const weather = activePlanting ? temperatures.get(activePlanting.id) : null;
           return (
             <Card key={plot.id}>
               <div className="stack">
@@ -54,6 +86,42 @@ export default async function KebunkuPage() {
                     <p className="muted flush">
                       Benih {activePlanting.seedName} · Tanam {formatDate(activePlanting.plantedAt)}{' '}
                       · Panen {formatDate(activePlanting.expectedHarvestAt)}
+                    </p>
+                    <dl className="integration-summary">
+                      <div>
+                        <dt>Suhu terkini</dt>
+                        <dd>
+                          {weather
+                            ? `${weather.temperatureC.toLocaleString('id-ID', { maximumFractionDigits: 1 })}°C`
+                            : activePlanting.dataPoints.temp === 'iot'
+                              ? 'Menunggu data sensor IoT'
+                              : 'Data suhu belum tersedia'}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt>Tahap tanam</dt>
+                        <dd>{integration?.calendar?.status.current_stage ?? 'Belum tersedia'}</dd>
+                      </div>
+                      <div>
+                        <dt>Tugas berikutnya</dt>
+                        <dd>
+                          {integration?.calendar?.status.next_task?.label ?? 'Belum tersedia'}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt>Prediksi harga</dt>
+                        <dd>
+                          {integration?.pricePrediction
+                            ? `Rp ${Math.round(integration.pricePrediction.predicted_price).toLocaleString('id-ID')}/kg`
+                            : 'Belum tersedia'}
+                        </dd>
+                      </div>
+                    </dl>
+                    <p className="muted data-point-copy">
+                      Data point:{' '}
+                      {Object.entries(activePlanting.dataPoints)
+                        .map(([name, source]) => `${name} (${source})`)
+                        .join(', ') || 'belum diatur'}
                     </p>
                     <div className="action-top">
                       <Button

@@ -52,10 +52,10 @@ export class NotificationService {
 
       try {
         const forecast = await priceService.getForecast(planting.id);
-        const bestSellWeeks = forecast.points.filter((point) => point.isBestSell);
-        if (bestSellWeeks.length > 0) {
-          const firstWeek = bestSellWeeks[0];
-          if (!firstWeek) {
+        const bestSellPoints = forecast.points.filter((point) => point.isBestSell);
+        if (bestSellPoints.length > 0) {
+          const firstPoint = bestSellPoints[0];
+          if (!firstPoint) {
             continue;
           }
 
@@ -76,14 +76,14 @@ export class NotificationService {
                 type: 'price',
                 priority: 'medium',
                 title: `Jendela jual terbaik: ${planting.crop.name}`,
-                body: `Minggu ${firstWeek.weekNumber}: perkiraan Rp ${firstWeek.expectedPrice.toLocaleString('id-ID')}/kg`,
+                body: `${firstPoint.targetDate}: prediksi Rp ${firstPoint.predictedPrice.toLocaleString('id-ID')}/kg dari model ML`,
               },
             });
             created.push(this.toDto(notification));
           }
         }
       } catch {
-        // Demo generator should continue when one forecast source is unavailable.
+        // Notification generation continues when the external prediction service is unavailable.
       }
     }
 

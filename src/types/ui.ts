@@ -3,6 +3,10 @@ export type Status = 'safe' | 'watch' | 'danger';
 export interface ApiProblem {
   error?: {
     message?: string;
+    details?: readonly {
+      field: string;
+      message: string;
+    }[];
   };
   message?: string;
 }

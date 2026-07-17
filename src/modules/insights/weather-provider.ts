@@ -11,21 +11,55 @@ export interface WeatherProvider {
   fetch(latitude: number, longitude: number): Promise<WeatherReading>;
 }
 
-export const dummyWeatherProvider: WeatherProvider = {
+interface WeatherApiResponse {
+  readonly observed_at: string;
+  readonly temperature_c: number;
+  readonly rainfall_mm: number;
+  readonly humidity_pct: number;
+  readonly wind_speed_kmh: number;
+  readonly source: string;
+}
+
+export class PlantingCalendarWeatherProvider implements WeatherProvider {
+  constructor(private readonly request = postWeather) {}
+
   async fetch(latitude: number, longitude: number): Promise<WeatherReading> {
-    // Deterministic dummy data based on coordinates.
-    // Not real BMKG data — demo fixture only.
-    const tempBase = 25 + Math.round(latitude * 10) / 10;
-    const humidity = 70 + (Math.round(longitude * 10) % 20);
-    const rainfall = Math.round(latitude * 100) % 15;
+    const baseUrl = process.env.PLANTING_CALENDAR_API_URL;
+    if (!baseUrl) {
+      throw new Error('PLANTING_CALENDAR_API_URL is not configured');
+    }
+    const reading = await this.request(`${baseUrl.replace(/\/$/, '')}/weather`, {
+      latitude,
+      longitude,
+      days: 7,
+    });
 
     return {
-      temperatureC: tempBase,
-      rainfallMm: rainfall,
-      humidityPct: humidity,
-      windSpeedKmh: 5 + (Math.round(longitude * 10) % 10),
-      observedAt: new Date(),
-      source: 'BMKG-village-forecast (demo)',
+      temperatureC: reading.temperature_c,
+      rainfallMm: reading.rainfall_mm,
+      humidityPct: reading.humidity_pct,
+      windSpeedKmh: reading.wind_speed_kmh,
+      observedAt: new Date(`${reading.observed_at}T00:00:00.000Z`),
+      source: reading.source,
     };
-  },
-};
+  }
+}
+
+async function postWeather(
+  url: string,
+  body: { latitude: number; longitude: number; days: number },
+): Promise<WeatherApiResponse> {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(65_000),
+    cache: 'no-store',
+  });
+  if (!response.ok) {
+    throw new Error(`Weather request failed with status ${response.status}`);
+  }
+  return (await response.json()) as WeatherApiResponse;
+}
+
+export const plantingCalendarWeatherProvider = new PlantingCalendarWeatherProvider();

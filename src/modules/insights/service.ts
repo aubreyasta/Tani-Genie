@@ -1,9 +1,8 @@
 import { NotFoundError } from '@/lib/errors';
 import { prisma } from '@/lib/prisma';
-import { getCropProfile } from '@/modules/catalog/crop-profiles';
 import type { PestAlertDto, VerdictDto, WeatherSnapshotDto } from '@/types/api';
 import { computeWeatherVerdict } from './verdict-engine';
-import { dummyWeatherProvider } from './weather-provider';
+import { plantingCalendarWeatherProvider } from './weather-provider';
 
 interface WeatherInsightDto {
   readonly verdict: VerdictDto;
@@ -26,35 +25,14 @@ export class InsightService {
       throw new NotFoundError('Tanaman', plantingId);
     }
 
-    const profile = getCropProfile(planting.crop.slug);
-    if (!profile) {
-      throw new NotFoundError('Profil komoditas', planting.crop.slug);
+    const profile = cropProfile(planting.crop);
+
+    const plot = await prisma.plot.findUnique({ where: { id: planting.plotId } });
+    if (!plot) {
+      throw new NotFoundError('Lahan', planting.plotId);
     }
-
-    let snapshot = await prisma.weatherSnapshot.findFirst({
-      where: { plantingId },
-      orderBy: { observedAt: 'desc' },
-    });
-
-    if (!snapshot) {
-      const plot = await prisma.plot.findUnique({ where: { id: planting.plotId } });
-      if (!plot) {
-        throw new NotFoundError('Lahan', planting.plotId);
-      }
-
-      const reading = await dummyWeatherProvider.fetch(plot.latitude, plot.longitude);
-      snapshot = await prisma.weatherSnapshot.create({
-        data: {
-          plantingId,
-          observedAt: reading.observedAt,
-          temperatureC: reading.temperatureC,
-          rainfallMm: reading.rainfallMm,
-          humidityPct: reading.humidityPct,
-          windSpeedKmh: reading.windSpeedKmh,
-          source: reading.source,
-        },
-      });
-    }
+    const reading = await plantingCalendarWeatherProvider.fetch(plot.latitude, plot.longitude);
+    const snapshot = await persistWeatherReading(plantingId, reading);
 
     const weatherDto = toWeatherSnapshotDto(snapshot);
     const verdict = computeWeatherVerdict(profile, {
@@ -88,32 +66,13 @@ export class InsightService {
       throw new NotFoundError('Tanaman', plantingId);
     }
 
-    const profile = getCropProfile(planting.crop.slug);
-    if (!profile) {
-      throw new NotFoundError('Profil komoditas', planting.crop.slug);
-    }
+    const profile = cropProfile(planting.crop);
 
-    const reading = await dummyWeatherProvider.fetch(
+    const reading = await plantingCalendarWeatherProvider.fetch(
       planting.plot.latitude,
       planting.plot.longitude,
     );
-    const existing = await prisma.weatherSnapshot.findFirst({
-      where: { plantingId, observedAt: reading.observedAt },
-    });
-
-    const snapshot =
-      existing ??
-      (await prisma.weatherSnapshot.create({
-        data: {
-          plantingId,
-          observedAt: reading.observedAt,
-          temperatureC: reading.temperatureC,
-          rainfallMm: reading.rainfallMm,
-          humidityPct: reading.humidityPct,
-          windSpeedKmh: reading.windSpeedKmh,
-          source: reading.source,
-        },
-      }));
+    const snapshot = await persistWeatherReading(plantingId, reading);
 
     const weatherDto = toWeatherSnapshotDto(snapshot);
     const verdict = computeWeatherVerdict(profile, {
@@ -181,3 +140,47 @@ async function getPestAlertDtos(plantingId: string): Promise<PestAlertDto[]> {
 }
 
 export const insightService = new InsightService();
+
+async function persistWeatherReading(
+  plantingId: string,
+  reading: {
+    temperatureC: number;
+    rainfallMm: number;
+    humidityPct: number;
+    windSpeedKmh: number;
+    observedAt: Date;
+    source: string;
+  },
+) {
+  const existing = await prisma.weatherSnapshot.findFirst({
+    where: { plantingId, observedAt: reading.observedAt, source: reading.source },
+  });
+  return (
+    existing ??
+    prisma.weatherSnapshot.create({
+      data: { plantingId, ...reading },
+    })
+  );
+}
+
+function cropProfile(crop: {
+  slug: string;
+  name: string;
+  commodityKey: string;
+  minTempC: number;
+  maxTempC: number;
+  minHumidity: number;
+  maxHumidity: number;
+  waterNeedMm: number;
+  gddBaseC: number;
+  gddTargetC: number;
+  pestRiskHumidity: number;
+  pestRiskTempC: number;
+}) {
+  return {
+    ...crop,
+    optimalTempC: (crop.minTempC + crop.maxTempC) / 2,
+    waterNeedMmPerWeek: crop.waterNeedMm,
+    growingSeasonDays: 0,
+  };
+}

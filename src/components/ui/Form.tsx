@@ -52,7 +52,8 @@ export function Form({
       });
       if (!response.ok) {
         const payload = (await response.json().catch(() => ({}))) as ApiProblem;
-        setError(payload.error?.message ?? payload.message ?? 'Form gagal disimpan');
+        const details = payload.error?.details?.map((detail) => detail.message).join('. ');
+        setError(details ?? payload.error?.message ?? payload.message ?? 'Form gagal disimpan');
         return;
       }
       form.reset();

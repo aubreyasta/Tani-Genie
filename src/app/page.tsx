@@ -26,20 +26,22 @@ export default async function HomePage() {
   const activePlantings = plantings.filter((planting) => planting.status === 'active');
   const weather = await Promise.all(
     activePlantings.map((planting) =>
-      apiGet<WeatherInsightDto>(`/api/insights/weather?plantingId=${planting.id}`),
+      apiGet<WeatherInsightDto>(`/api/insights/weather?plantingId=${planting.id}`).catch(
+        () => null,
+      ),
     ),
   );
   const prices = await Promise.all(
     activePlantings.map((planting) =>
-      apiGet<PriceForecastDto>(`/api/forecasts/prices?plantingId=${planting.id}`),
+      apiGet<PriceForecastDto>(`/api/forecasts/prices?plantingId=${planting.id}`).catch(() => null),
     ),
   );
-  const topWeather = weather.sort(
-    (a, b) => priority(b.verdict.status) - priority(a.verdict.status),
-  )[0];
+  const topWeather = weather
+    .filter((insight): insight is WeatherInsightDto => insight !== null)
+    .sort((a, b) => priority(b.verdict.status) - priority(a.verdict.status))[0];
   const bestPrice = prices
-    .flatMap((forecast) => forecast.points.filter((point) => point.isBestSell))
-    .sort((a, b) => a.weekNumber - b.weekNumber)[0];
+    .flatMap((forecast) => forecast?.points.filter((point) => point.isBestSell) ?? [])
+    .sort((a, b) => a.horizonDays - b.horizonDays)[0];
   const topNotification =
     notifications.find((notification) => !notification.isRead) ?? notifications[0];
 
@@ -71,7 +73,7 @@ export default async function HomePage() {
         <Card>
           <strong>
             {bestPrice
-              ? `${formatRupiah(bestPrice.expectedPrice)} · minggu ${bestPrice.weekNumber}`
+              ? `${formatRupiah(bestPrice.predictedPrice)} · ${bestPrice.horizonDays} hari`
               : 'Belum ada'}
           </strong>
           <p className="muted flush">Jendela harga terbaik</p>

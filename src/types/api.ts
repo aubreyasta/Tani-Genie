@@ -60,6 +60,50 @@ export interface PlantingDto {
   plantedAt: string;
   expectedHarvestAt: string;
   status: 'active' | 'finished' | 'planned';
+  dataPoints: DataPointMapping;
+}
+
+export type DataPointSource = 'api' | 'iot';
+
+export interface DataPointMapping {
+  temp?: DataPointSource | undefined;
+  humidity?: DataPointSource | undefined;
+  rainfall?: DataPointSource | undefined;
+  soil_moisture?: DataPointSource | undefined;
+  nutrients_ph?: DataPointSource | undefined;
+}
+
+export interface PlantingCalendarDto {
+  crop: string;
+  planting_date: string;
+  harvest_date: string;
+  stages: Array<{ name: string; start_date: string; end_date: string }>;
+  tasks: Array<{ label: string; date: string; day: number }>;
+  status: {
+    day_n: number;
+    total_days: number;
+    progress_pct: number;
+    current_stage: string;
+    days_to_harvest: number;
+    next_task: { label: string; date: string; days_until: number } | null;
+  };
+}
+
+export interface MlPricePredictionDto {
+  commodity: string;
+  market: string;
+  province: string;
+  target_date: string;
+  predicted_price: number;
+  horizon_days: number;
+  last_known_date: string;
+  last_known_price: number;
+}
+
+export interface PlantingIntegrationDto {
+  calendar: PlantingCalendarDto | null;
+  pricePrediction: MlPricePredictionDto | null;
+  unavailable: string[];
 }
 
 export interface WeatherSnapshotDto {
@@ -98,25 +142,22 @@ export interface PestAlertDto {
 }
 
 export interface PriceForecastPointDto {
-  weekNumber: number;
-  expectedPrice: number;
-  lowerBound: number;
-  upperBound: number;
+  targetDate: string;
+  horizonDays: number;
+  predictedPrice: number;
   isBestSell: boolean;
 }
 
 export interface PriceForecastDto {
   plantingId: string;
   commodityKey: string;
-  currentPrice: number;
+  market: string;
+  province: string;
+  lastKnownDate: string;
+  lastKnownPrice: number;
   points: PriceForecastPointDto[];
-  bestSellWindow: {
-    startWeek: number;
-    endWeek: number;
-  };
-  generatedAt: string;
+  bestSellTargetDate: string;
   source: string;
-  isDemo: boolean;
 }
 
 export interface NotificationDto {

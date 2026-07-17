@@ -59,6 +59,7 @@ model PlantingCycle {
   plantedAt       DateTime
   expectedHarvestAt DateTime
   status          String   @default("active")
+  dataPoints      Json     @default("{}")
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   plot            Plot             @relation(fields: [plotId], references: [id], onDelete: Cascade)

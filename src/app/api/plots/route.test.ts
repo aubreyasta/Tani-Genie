@@ -30,6 +30,32 @@ describe('/api/plots', () => {
     expect(catalog.listPlots).toHaveBeenCalledWith('11111111-1111-4111-8111-111111111111');
   });
 
+  it('accepts a valid plot for an opaque internal farmer id', async () => {
+    catalog.getDefaultFarmer.mockResolvedValue({ id: 'default-farmer' });
+    catalog.createPlot.mockResolvedValue({ id: 'plot-1', name: 'Petak Utara' });
+    const request = new NextRequest('http://localhost/api/plots', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'Petak Utara',
+        areaM2: 500,
+        latitude: -7.7956,
+        longitude: 110.3695,
+      }),
+    });
+
+    const response = await POST(request);
+
+    expect(response.status).toBe(201);
+    expect(catalog.createPlot).toHaveBeenCalledWith({
+      farmerId: 'default-farmer',
+      name: 'Petak Utara',
+      areaM2: 500,
+      latitude: -7.7956,
+      longitude: 110.3695,
+    });
+  });
+
   it('returns field details and does not write an invalid payload', async () => {
     const request = new NextRequest('http://localhost/api/plots', {
       method: 'POST',

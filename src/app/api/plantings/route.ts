@@ -45,6 +45,7 @@ export async function POST(request: NextRequest) {
       ...result.data,
       plantedAt: new Date(result.data.plantedAt),
       expectedHarvestAt: new Date(result.data.expectedHarvestAt),
+      dataPoints: result.data.dataPoints,
     });
     return success(planting, 201);
   } catch (error) {

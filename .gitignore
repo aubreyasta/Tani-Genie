@@ -36,3 +36,7 @@ tsconfig.tsbuildinfo
 
 # Reference materials (briefs, images)
 reference/
+
+# Local worktrees for team-owned services
+tani-genie-planting-calendar/
+tani-genie-price-prediction/
