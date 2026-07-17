@@ -1,0 +1,28 @@
+version: "0.1.0"
+random_seed: 42
+aggregator: snorkel
+snorkel:
+  epochs: 500
+  learning_rate: 0.01
+  class_balance: [0.70, 0.30]
+weak_label_training:
+  positive_cutoff: 0.70
+  negative_cutoff: 0.30
+  minimum_vote_coverage: 0.20
+  minimum_class_rows: 100
+model:
+  type: hist_gradient_boosting
+  max_iter: 50
+  max_training_rows: 12000
+  l2_regularization: 0.10
+  learning_rate: 0.06
+  max_leaf_nodes: 31
+  min_samples_leaf: 30
+calibration:
+  method: sigmoid
+risk_thresholds:
+  low_max: 0.30
+  medium_max: 0.65
+splits:
+  train_fraction: 0.70
+  validation_fraction: 0.15

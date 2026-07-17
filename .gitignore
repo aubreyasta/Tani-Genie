@@ -1,0 +1,52 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Testing and tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Raw and processed datasets
+data/raw/*
+!data/raw/.gitkeep
+
+data/processed/*
+!data/processed/.gitkeep
+
+# Field labels may contain sensitive information
+data/gold/*
+!data/gold/.gitkeep
+!data/gold/gold_labels_template.csv
+
+# Generated artifacts
+models/*
+!models/.gitkeep
+
+reports/*
+!reports/.gitkeep
+
+# Temporary exports
+*.zip
+*.tar
+*.tar.gz
+*.log

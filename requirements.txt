@@ -1,0 +1,14 @@
+# Python 3.11 is the tested runtime for the Docker image.
+fastapi>=0.115,<1
+uvicorn[standard]>=0.34,<1
+pydantic>=2.10,<3
+pydantic-settings>=2.7,<3
+numpy>=1.26,<2.1
+pandas>=2.2,<3
+pyarrow>=18,<24
+scikit-learn>=1.5,<2
+scipy>=1.12,<2
+joblib>=1.4,<2
+PyYAML>=6,<7
+snorkel==0.10.0
+torch>=2.2,<3

@@ -1,0 +1,16 @@
+services:
+  pest-risk:
+    build: .
+    ports:
+      - "8002:8002"
+    environment:
+      PEST_RISK_MODEL_DIR: /app/models
+      PEST_RISK_RULE_CONFIG: /app/configs/disease_rules.yaml
+      PEST_RISK_CROP_CONFIG: /app/configs/crops.yaml
+      PEST_RISK_ALLOW_RULE_FALLBACK: "true"
+      OMP_NUM_THREADS: "4"
+      OPENBLAS_NUM_THREADS: "4"
+      MKL_NUM_THREADS: "4"
+    volumes:
+      - ./models:/app/models:ro
+      - ./configs:/app/configs:ro

@@ -1,0 +1,32 @@
+// Optional persistence model. Merge into prisma/schema.prisma only when
+// historical risk snapshots and farmer feedback are required.
+model PestRiskSnapshot {
+  id               String   @id @default(cuid())
+  plantingId       String
+  predictionDate   DateTime
+  diseaseId        String
+  riskScore        Float
+  riskLevel        String
+  confidence       Float
+  predictionMethod String
+  modelVersion     String?
+  ruleVersion      String
+  payload          Json
+  createdAt        DateTime @default(now())
+
+  @@index([plantingId, predictionDate])
+  @@index([diseaseId, predictionDate])
+}
+
+model PestRiskFeedback {
+  id             String   @id @default(cuid())
+  snapshotId     String
+  observed       Boolean?
+  severityPct    Float?
+  observation    String?
+  photoUrl       String?
+  observerUserId String?
+  createdAt      DateTime @default(now())
+
+  @@index([snapshotId])
+}

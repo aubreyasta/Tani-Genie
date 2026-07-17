@@ -1,0 +1,262 @@
+version: "0.1.0"
+labels:
+  abstain: -1
+  negative: 0
+  positive: 1
+
+# The rules below are seed labeling functions, not clinically/agronomically
+# validated decision thresholds for Indonesia. Every threshold must be reviewed
+# against local observations before production alerts are enabled.
+diseases:
+  onion_downy_mildew:
+    display_name: Embun Bulu Bawang
+    pathogen: Peronospora destructor
+    category: OOMYCETE_DISEASE
+    crops: [shallot, garlic]
+    forecast_horizon_days: 5
+    confidence_tier: medium
+    description: >-
+      Risiko kondisi lingkungan yang mendukung sporulasi dan infeksi embun bulu
+      pada bawang merah atau bawang putih.
+    sources:
+      - id: ucanr_onion_downy_mildew
+        title: Downy Mildew — Onion and Garlic
+        organization: University of California Statewide IPM Program
+        url: https://ipm.ucanr.edu/agriculture/onion-and-garlic/downy-mildew/
+        notes: >-
+          Sporulation at canopy RH around 95%; infection requires leaf wetness,
+          with required duration depending on temperature. High temperature
+          suppresses sporulation.
+      - id: ucanr_home_onion_downy
+        title: Downy Mildew on Onions and Garlic
+        organization: University of California Statewide IPM Program
+        url: https://ipm.ucanr.edu/PMG/GARDEN/VEGES/DISEASES/oniondownymil.html
+        notes: >-
+          Epidemics can develop under approximately 1.5–7 hours leaf wetness and
+          43–80°F (about 6–27°C); dry conditions rapidly kill spores.
+    rules:
+      - id: odm_strict_cool_wet
+        vote: positive
+        weight: 1.00
+        rationale: Cool temperature, very high RH, and current-day wetness.
+        all:
+          - {feature: temp_avg_3d_c, op: between, value: [6, 22]}
+          - {feature: rh_mean_3d_pct, op: gte, value: 95}
+          - {feature: wet_hours_1d, op: gte, value: 3}
+      - id: odm_moderate_multiday
+        vote: positive
+        weight: 0.80
+        rationale: Multiple humid and wet days in a biologically plausible temperature range.
+        all:
+          - {feature: temp_avg_3d_c, op: between, value: [6, 27]}
+          - {feature: rh_mean_3d_pct, op: gte, value: 90}
+          - {feature: wet_days_3d, op: gte, value: 2}
+      - id: odm_humid_canopy_proxy
+        vote: positive
+        weight: 0.55
+        rationale: Regional vegetation and wet conditions are a weak canopy proxy.
+        all:
+          - {feature: rh_max_3d_pct, op: gte, value: 95}
+          - {feature: rain_sum_3d_mm, op: gte, value: 5}
+          - {feature: ndvi_mean_7d, op: gte, value: 0.50}
+      - id: odm_dry_negative
+        vote: negative
+        weight: 1.00
+        rationale: Dry air and almost no estimated leaf wetness are unfavorable.
+        all:
+          - {feature: rh_mean_3d_pct, op: lt, value: 80}
+          - {feature: wet_hours_3d, op: lte, value: 1}
+      - id: odm_hot_dry_negative
+        vote: negative
+        weight: 0.85
+        rationale: Sustained heat with little wetness suppresses sporulation.
+        all:
+          - {feature: temp_max_3d_c, op: gt, value: 30}
+          - {feature: wet_hours_3d, op: lt, value: 3}
+
+  rice_blast:
+    display_name: Blast Padi
+    pathogen: Magnaporthe oryzae
+    category: FUNGAL_DISEASE
+    crops: [rice]
+    forecast_horizon_days: 5
+    confidence_tier: medium
+    description: >-
+      Risiko lingkungan kondusif untuk blast padi berdasarkan kelembapan,
+      kebasahan, hujan, dan suhu. Nitrogen, varietas, dan fase tanaman belum tersedia.
+    sources:
+      - id: irri_rice_blast
+        title: Blast (leaf and collar)
+        organization: International Rice Research Institute Rice Knowledge Bank
+        url: https://www.knowledgebank.irri.org/training/fact-sheets/pest-management/diseases/item/blast-leaf-collar
+        notes: >-
+          Blast is favored by prolonged rain, high humidity, long leaf wetness,
+          and relatively cool conditions; crop nutrition and susceptibility matter.
+    rules:
+      - id: rb_strict_humid_wet
+        vote: positive
+        weight: 1.00
+        rationale: High RH, long wetness, and moderate temperature.
+        all:
+          - {feature: temp_avg_3d_c, op: between, value: [20, 28]}
+          - {feature: rh_mean_3d_pct, op: gte, value: 90}
+          - {feature: wet_hours_3d, op: gte, value: 12}
+      - id: rb_rain_sequence
+        vote: positive
+        weight: 0.80
+        rationale: Repeated rain and humid nights provide infection opportunities.
+        all:
+          - {feature: rainy_days_3d, op: gte, value: 2}
+          - {feature: rh_max_3d_pct, op: gte, value: 95}
+          - {feature: temp_min_3d_c, op: between, value: [18, 26]}
+      - id: rb_extended_wetness
+        vote: positive
+        weight: 0.70
+        rationale: Extended accumulated wetness in one week.
+        all:
+          - {feature: wet_hours_7d, op: gte, value: 30}
+          - {feature: rh_mean_7d_pct, op: gte, value: 85}
+      - id: rb_dry_negative
+        vote: negative
+        weight: 1.00
+        rationale: Very low wetness and humidity reduce infection opportunity.
+        all:
+          - {feature: wet_hours_3d, op: lte, value: 2}
+          - {feature: rh_mean_3d_pct, op: lt, value: 75}
+      - id: rb_hot_dry_negative
+        vote: negative
+        weight: 0.75
+        rationale: Hot, relatively dry conditions are less favorable for the seed model.
+        all:
+          - {feature: temp_avg_3d_c, op: gt, value: 32}
+          - {feature: rainy_days_3d, op: eq, value: 0}
+
+  chili_phytophthora:
+    display_name: Busuk Phytophthora Cabai
+    pathogen: Phytophthora capsici
+    category: OOMYCETE_DISEASE
+    crops: [chili_red, chili_bird_eye]
+    forecast_horizon_days: 5
+    confidence_tier: medium
+    description: >-
+      Risiko kondisi hangat dan sangat basah yang mendukung Phytophthora pada cabai.
+      Genangan aktual dan drainase lahan belum tersedia sehingga kelembapan tanah
+      dan hujan digunakan sebagai proxy.
+    sources:
+      - id: aps_phytophthora_bligh
+        title: Phytophthora Blight — A Serious Threat to Cucurbit Industries
+        organization: American Phytopathological Society
+        url: https://www.apsnet.org/edcenter/apsnetfeatures/Pages/PhytophthoraBlight.aspx
+        notes: >-
+          P. capsici disease is associated with wet, warm soil around 20–30°C;
+          severe symptoms often follow soil saturation from rain or irrigation.
+      - id: phytophthora_capsici_temperature_study
+        title: Effect of Temperature on Infection and Development of Phytophthora Blight
+        organization: Plant Disease / APS
+        url: https://pubmed.ncbi.nlm.nih.gov/17650858/
+        notes: >-
+          Controlled experiments show temperature-dependent infection and disease
+          development; thresholds differ by isolate, host tissue, and experiment.
+    rules:
+      - id: cp_strict_warm_saturated_proxy
+        vote: positive
+        weight: 1.00
+        rationale: Warm conditions, substantial rain, and high root-zone anomaly.
+        all:
+          - {feature: temp_avg_3d_c, op: between, value: [20, 30]}
+          - {feature: rain_sum_3d_mm, op: gte, value: 20}
+          - {feature: root_soil_z_90d, op: gte, value: 1.0}
+      - id: cp_multiday_saturation_proxy
+        vote: positive
+        weight: 0.90
+        rationale: Multiple rainy days with unusually wet root-zone conditions.
+        all:
+          - {feature: rainy_days_3d, op: gte, value: 2}
+          - {feature: root_soil_z_90d, op: gte, value: 1.5}
+      - id: cp_extreme_rain_anomaly
+        vote: positive
+        weight: 0.70
+        rationale: Unusually high rainfall and wet surface soil indicate splash and ponding risk.
+        all:
+          - {feature: rainfall_z_90d, op: gte, value: 1.5}
+          - {feature: surface_soil_z_90d, op: gte, value: 1.0}
+          - {feature: temp_avg_3d_c, op: between, value: [18, 32]}
+      - id: cp_dry_soil_negative
+        vote: negative
+        weight: 1.00
+        rationale: No recent rain and below-normal root-zone moisture are unfavorable.
+        all:
+          - {feature: rainy_days_3d, op: eq, value: 0}
+          - {feature: root_soil_z_90d, op: lt, value: -0.5}
+      - id: cp_low_moisture_negative
+        vote: negative
+        weight: 0.75
+        rationale: Low surface and root-zone moisture reduce water-mold pressure.
+        all:
+          - {feature: surface_soil_z_90d, op: lt, value: -0.5}
+          - {feature: root_soil_z_90d, op: lt, value: 0.0}
+          - {feature: rain_sum_7d_mm, op: lt, value: 5}
+
+  chili_anthracnose:
+    display_name: Antraknosa Cabai
+    pathogen: Colletotrichum spp.
+    category: FUNGAL_DISEASE
+    crops: [chili_red, chili_bird_eye]
+    forecast_horizon_days: 5
+    confidence_tier: low
+    description: >-
+      Seed risk model for wet, warm conditions associated with pepper anthracnose.
+      Fruit stage, cultivar, pathogen species, and inoculum are unavailable, so this
+      disease must be shown with lower confidence than the other MVP models.
+    sources:
+      - id: aps_pepper_anthracnose_wetness
+        title: Influence of Inoculum Density, Wetness Duration, Plant Age, and Temperature
+        organization: Plant Disease / American Phytopathological Society
+        url: https://apsjournals.apsnet.org/doi/10.1094/PDIS.1998.82.10.1079
+        notes: >-
+          Controlled work reported that about 24–36 hours continuous wetness can
+          induce symptoms, with outcomes depending on temperature and plant age.
+      - id: aps_pepper_inoculation_method
+        title: Inoculation Method, Temperature, and Relative Humidity Affect Pepper Disease
+        organization: Plant Health Progress / American Phytopathological Society
+        url: https://apsjournals.apsnet.org/doi/10.1094/PHP-10-17-0063-RS
+        notes: >-
+          Foliar infection was favored around 28°C and wetness longer than 24 hours.
+    rules:
+      - id: ca_strict_warm_long_wet
+        vote: positive
+        weight: 1.00
+        rationale: Warm temperature and at least roughly 24 hours accumulated wetness.
+        all:
+          - {feature: temp_avg_3d_c, op: between, value: [25, 30]}
+          - {feature: wet_hours_3d, op: gte, value: 24}
+          - {feature: rh_mean_3d_pct, op: gte, value: 90}
+      - id: ca_wet_week
+        vote: positive
+        weight: 0.70
+        rationale: Repeated rain and long weekly wetness are a weaker outbreak proxy.
+        all:
+          - {feature: rainy_days_7d, op: gte, value: 3}
+          - {feature: wet_hours_7d, op: gte, value: 36}
+          - {feature: temp_avg_7d_c, op: between, value: [22, 32]}
+      - id: ca_splash_humidity
+        vote: positive
+        weight: 0.55
+        rationale: Rain splash and high RH may support dispersal and infection.
+        all:
+          - {feature: rain_sum_3d_mm, op: gte, value: 15}
+          - {feature: rh_max_3d_pct, op: gte, value: 95}
+      - id: ca_dry_negative
+        vote: negative
+        weight: 1.00
+        rationale: Little wetness and no rain strongly reduce the seed risk score.
+        all:
+          - {feature: wet_hours_3d, op: lte, value: 3}
+          - {feature: rainy_days_3d, op: eq, value: 0}
+      - id: ca_cool_dry_negative
+        vote: negative
+        weight: 0.70
+        rationale: Cool and dry conditions are less favorable for this warm-wet seed model.
+        all:
+          - {feature: temp_avg_3d_c, op: lt, value: 18}
+          - {feature: rh_mean_3d_pct, op: lt, value: 80}

@@ -1,0 +1,22 @@
+version: "0.1.0"
+crops:
+  shallot:
+    display_name: Bawang Merah
+    aliases: [shallot, bawang_merah, bawang merah, red_onion]
+    supported_diseases: [onion_downy_mildew]
+  garlic:
+    display_name: Bawang Putih
+    aliases: [garlic, bawang_putih, bawang putih]
+    supported_diseases: [onion_downy_mildew]
+  chili_red:
+    display_name: Cabai Merah
+    aliases: [chili_red, cabai_merah, cabai merah, red_chili, chili]
+    supported_diseases: [chili_phytophthora, chili_anthracnose]
+  chili_bird_eye:
+    display_name: Cabai Rawit
+    aliases: [chili_bird_eye, cabai_rawit, cabai rawit, bird_eye_chili]
+    supported_diseases: [chili_phytophthora, chili_anthracnose]
+  rice:
+    display_name: Padi
+    aliases: [rice, padi, beras]
+    supported_diseases: [rice_blast]
