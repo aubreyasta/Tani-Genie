@@ -1,3 +1,14 @@
+"""
+gdd.py — the "smart" heat-based layer.
+
+Growing Degree Days = accumulated heat above a crop's base temperature.
+Feeding real daily Tmax/Tmin here gives a harvest date that reacts to weather
+(earlier in a hot spell, later in a cool one) instead of a fixed day count.
+
+Expects a pandas DataFrame with columns T2M_MAX and T2M_MIN (the exact output
+of weather.fetch_nasa_power), indexed by date.
+"""
+
 import datetime as dt
 import math
 
@@ -5,12 +16,14 @@ from .crops import CROPS
 
 
 def daily_gdd(tmax, tmin, tbase, tupper=30.0):
-    tmax = min(tmax, tupper)       
-    tmin = max(tmin, tbase)    
+    """Heat units banked in one day (with the standard high/low cutoffs)."""
+    tmax = min(tmax, tupper)       # no extra credit above ~30 C
+    tmin = max(tmin, tbase)        # nor below the base temperature
     return max(0.0, (tmax + tmin) / 2.0 - tbase)
 
 
 def add_gdd_columns(weather_df, tbase, tupper=30.0):
+    """Add 'gdd' (per day) and 'gdd_cum' (running total) columns."""
     df = weather_df.copy()
     df["gdd"] = [daily_gdd(mx, mn, tbase, tupper)
                  for mx, mn in zip(df["T2M_MAX"], df["T2M_MIN"])]
@@ -19,6 +32,13 @@ def add_gdd_columns(weather_df, tbase, tupper=30.0):
 
 
 def gdd_status(crop_key, planting_date, weather_df, on_date=None):
+    """
+    Weather-adjusted harvest estimate.
+
+    weather_df : daily Tmax/Tmin from planting_date up to on_date.
+    Returns accumulated heat, progress, a projected harvest date that responds
+    to temperature, and the plain-calendar date for comparison.
+    """
     crop = CROPS[crop_key]
     tbase = crop["base_temp_c"]
     target = crop["gdd_to_harvest"]
@@ -27,7 +47,7 @@ def gdd_status(crop_key, planting_date, weather_df, on_date=None):
 
     df = add_gdd_columns(weather_df, tbase)
     accumulated = float(df["gdd"].sum())
-    recent_rate = float(df["gdd"].tail(10).mean())
+    recent_rate = float(df["gdd"].tail(10).mean())        # heat/day lately
     remaining = max(0.0, target - accumulated)
     days_left = math.ceil(remaining / recent_rate) if recent_rate > 0 else None
 
@@ -42,7 +62,37 @@ def gdd_status(crop_key, planting_date, weather_df, on_date=None):
         "target_gdd": target,
         "progress_pct": max(0, min(100, round(accumulated / target * 100))),
         "recent_gdd_per_day": round(recent_rate, 1),
-        "projected_harvest": projected_harvest,   
-        "calendar_harvest": calendar_harvest,    
-        "days_vs_calendar": diff,                  
+        "projected_harvest": projected_harvest,   # weather-adjusted
+        "calendar_harvest": calendar_harvest,      # fixed-day
+        "days_vs_calendar": diff,                  # negative = earlier
+    }
+
+
+def gdd_stage(crop_key, weather_df, on_date=None):
+    """
+    Drive calendar PROGRESS from heat (not just the harvest date).
+
+    Converts accumulated GDD into an 'effective day' — how far along the crop
+    really is given the temperatures it has seen — and returns the stage that
+    implies. This is what lets the calendar's stage/progress react to weather.
+    """
+    crop = CROPS[crop_key]
+    df = add_gdd_columns(weather_df, crop["base_temp_c"])
+    accumulated = float(df["gdd"].sum())
+    target = crop["gdd_to_harvest"]
+
+    heat_per_day = target / crop["days_to_harvest"]        # nominal heat/day
+    effective_day = int(accumulated / heat_per_day) if heat_per_day else 0
+
+    heat_stage = "Pematangan / selesai"
+    for s in crop["stages"]:
+        if s["start"] <= effective_day <= s["end"]:
+            heat_stage = s["name"]
+            break
+
+    return {
+        "accumulated_gdd": round(accumulated),
+        "effective_day": effective_day,                    # heat-adjusted progress
+        "progress_pct": max(0, min(100, round(accumulated / target * 100))),
+        "heat_stage": heat_stage,                          # stage implied by heat
     }
