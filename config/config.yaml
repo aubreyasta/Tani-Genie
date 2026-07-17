@@ -1,0 +1,45 @@
+## Central configuration for the Tani Genie price prediction pipeline
+## Everything the code needs to know about paths, commodities and markets
+## lives here so the source code has no hard-coded strings.
+
+paths:
+  raw_dir: "data/raw"
+  interim_dir: "data/interim"
+  processed_dir: "data/processed"
+  models_dir: "models"
+
+# Commodities in scope for this hackathon deliverable.
+# (The raw data also contains daging_ayam, daging_sapi, gula_pasir,
+# minyak_goreng, telur_ayam -- intentionally ignored per project scope.)
+commodities:
+  - beras
+  - bawang_merah
+  - bawang_putih
+  - cabai_merah
+  - cabai_rawit
+
+# Market levels ("segments") available in the raw data.
+# folder_layout: "split"  -> data/raw/<market>/cleaned/<c>.csv + data/raw/<market>/continuation/<c>.csv
+# folder_layout: "single" -> data/raw/<market>/<c>.csv (already one continuous file)
+markets:
+  pasar_tradisional:
+    folder_layout: split
+  pasar_modern:
+    folder_layout: split
+  pedagang_besar:
+    folder_layout: single
+  produsen:
+    folder_layout: split
+
+date_column: "Date_Param"
+# Column some (but not all) raw files use for the national aggregate.
+# It is dropped during loading since we model at province granularity.
+national_aggregate_column: "Semua Provinsi"
+
+# Train/validation split: last N days held out for validation
+validation_days: 30
+
+# Forecast horizon the API supports out of the box (days ahead)
+max_forecast_horizon_days: 30
+
+random_seed: 42

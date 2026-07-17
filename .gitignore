@@ -1,0 +1,30 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Data & model artifacts (regenerate via the pipeline; don't bloat git history)
+data/interim/*
+data/processed/*
+!data/interim/.gitkeep
+!data/processed/.gitkeep
+models/*.joblib
+models/training_metrics.json
+
+# Keep raw data out of git if it's large / sensitive -- comment this out
+# if you want raw CSVs versioned in this repo.
+# data/raw/*
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Env files
+.env
