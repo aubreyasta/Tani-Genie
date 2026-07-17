@@ -24,18 +24,22 @@ export default async function HomePage() {
     apiGet<ReadonlyArray<NotificationDto>>('/api/notifications'),
   ]);
   const activePlantings = plantings.filter((planting) => planting.status === 'active');
-  const weather = await Promise.all(
-    activePlantings.map((planting) =>
-      apiGet<WeatherInsightDto>(`/api/insights/weather?plantingId=${planting.id}`).catch(
-        () => null,
+  const [weather, prices] = await Promise.all([
+    Promise.all(
+      activePlantings.map((planting) =>
+        apiGet<WeatherInsightDto>(`/api/insights/weather?plantingId=${planting.id}`).catch(
+          () => null,
+        ),
       ),
     ),
-  );
-  const prices = await Promise.all(
-    activePlantings.map((planting) =>
-      apiGet<PriceForecastDto>(`/api/forecasts/prices?plantingId=${planting.id}`).catch(() => null),
+    Promise.all(
+      activePlantings.map((planting) =>
+        apiGet<PriceForecastDto>(`/api/forecasts/prices?plantingId=${planting.id}`).catch(
+          () => null,
+        ),
+      ),
     ),
-  );
+  ]);
   const topWeather = weather
     .filter((insight): insight is WeatherInsightDto => insight !== null)
     .sort((a, b) => priority(b.verdict.status) - priority(a.verdict.status))[0];
@@ -47,7 +51,9 @@ export default async function HomePage() {
 
   return (
     <div className="page-shell stack">
-      <section className={`verdict-card verdict-${topWeather?.verdict.status ?? 'safe'}`}>
+      <section
+        className={`verdict-card hero-verdict verdict-${topWeather?.verdict.status ?? 'safe'}`}
+      >
         <p className="eyebrow">Tanigata</p>
         <h1 className="home-title">Selamat datang, {farmer.name}</h1>
         <p className="home-copy">
@@ -57,12 +63,12 @@ export default async function HomePage() {
         </p>
       </section>
 
-      <section className="dashboard-grid" aria-label="Ringkasan dashboard">
-        <Card>
-          <strong>{activePlantings.length}</strong>
+      <section className="dashboard-grid stat-grid" aria-label="Ringkasan dashboard">
+        <Card className="stat-card">
+          <strong className="stat-value">{activePlantings.length}</strong>
           <p className="muted flush">Tanaman aktif</p>
         </Card>
-        <Card>
+        <Card className="stat-card">
           {topWeather ? (
             <StatusBadge status={topWeather.verdict.status} />
           ) : (
@@ -70,30 +76,37 @@ export default async function HomePage() {
           )}
           <p className="hero-copy">Status cuaca tertinggi</p>
         </Card>
-        <Card>
-          <strong>
+        <Card className="stat-card">
+          <strong className="stat-value stat-value-small">
             {bestPrice
               ? `${formatRupiah(bestPrice.predictedPrice)} · ${bestPrice.horizonDays} hari`
               : 'Belum ada'}
           </strong>
           <p className="muted flush">Jendela harga terbaik</p>
         </Card>
-        <Card>
-          <strong>{notifications.filter((item) => !item.isRead).length}</strong>
+        <Card className="stat-card">
+          <strong className="stat-value">
+            {notifications.filter((item) => !item.isRead).length}
+          </strong>
           <p className="muted flush">Notifikasi belum dibaca</p>
         </Card>
       </section>
 
-      <section className="dashboard-grid" aria-label="Fitur Tanigata">
-        {featureCards.map((card) => (
-          <Link key={card.href} href={card.href} className="feature-link">
-            <strong>{card.title}</strong>
-            <span>{card.description}</span>
-          </Link>
-        ))}
+      <section aria-labelledby="feature-heading">
+        <p className="eyebrow" id="feature-heading">
+          Jelajahi Tanigata
+        </p>
+        <div className="dashboard-grid feature-grid">
+          {featureCards.map((card) => (
+            <Link key={card.href} href={card.href} className="feature-link">
+              <strong>{card.title}</strong>
+              <span>{card.description}</span>
+            </Link>
+          ))}
+        </div>
       </section>
 
-      <Card>
+      <Card className="focus-card">
         <h2 className="flush">Aksi Cepat</h2>
         <p className="quick-copy">
           {topNotification

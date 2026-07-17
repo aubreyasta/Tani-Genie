@@ -71,6 +71,7 @@ export class InsightService {
     const reading = await plantingCalendarWeatherProvider.fetch(
       planting.plot.latitude,
       planting.plot.longitude,
+      true,
     );
     const snapshot = await persistWeatherReading(plantingId, reading);
 

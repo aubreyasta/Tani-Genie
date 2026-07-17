@@ -21,9 +21,19 @@ interface WeatherApiResponse {
 }
 
 export class PlantingCalendarWeatherProvider implements WeatherProvider {
+  private readonly cache = new AsyncTtlCache<WeatherReading>(15 * 60 * 1000);
+
   constructor(private readonly request = postWeather) {}
 
-  async fetch(latitude: number, longitude: number): Promise<WeatherReading> {
+  async fetch(latitude: number, longitude: number, force = false): Promise<WeatherReading> {
+    return this.cache.get(
+      `${latitude.toFixed(4)}:${longitude.toFixed(4)}`,
+      () => this.fetchUncached(latitude, longitude),
+      force,
+    );
+  }
+
+  private async fetchUncached(latitude: number, longitude: number): Promise<WeatherReading> {
     const baseUrl = process.env.PLANTING_CALENDAR_API_URL;
     if (!baseUrl) {
       throw new Error('PLANTING_CALENDAR_API_URL is not configured');
@@ -53,7 +63,7 @@ async function postWeather(
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
-    signal: AbortSignal.timeout(65_000),
+    signal: AbortSignal.timeout(envTimeout('WEATHER_API_TIMEOUT_MS', 8_000)),
     cache: 'no-store',
   });
   if (!response.ok) {
@@ -63,3 +73,5 @@ async function postWeather(
 }
 
 export const plantingCalendarWeatherProvider = new PlantingCalendarWeatherProvider();
+
+import { AsyncTtlCache, envTimeout } from '@/lib/async-cache';

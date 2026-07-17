@@ -14,25 +14,28 @@ export default async function KebunkuPage() {
     apiGet<ReadonlyArray<CropDto>>('/api/crops'),
   ]);
   const activeCount = plantings.filter((planting) => planting.status === 'active').length;
-  const integrationEntries = await Promise.all(
-    plantings
-      .filter((planting) => planting.status === 'active')
-      .map(
+  const activePlantings = plantings.filter((planting) => planting.status === 'active');
+  const apiTemperaturePlantings = plantings.filter(
+    (planting) => planting.status === 'active' && planting.dataPoints.temp === 'api',
+  );
+  const [integrationResults, weatherResults] = await Promise.all([
+    Promise.allSettled(
+      activePlantings.map(
         async (planting) =>
           [
             planting.id,
             await apiGet<PlantingIntegrationDto>(`/api/plantings/${planting.id}/integrations`),
           ] as const,
       ),
-  );
-  const integrations = new Map(integrationEntries);
-  const apiTemperaturePlantings = plantings.filter(
-    (planting) => planting.status === 'active' && planting.dataPoints.temp === 'api',
-  );
-  const weatherResults = await Promise.allSettled(
-    apiTemperaturePlantings.map((planting) =>
-      apiGet<WeatherInsightDto>(`/api/insights/weather?plantingId=${planting.id}`),
     ),
+    Promise.allSettled(
+      apiTemperaturePlantings.map((planting) =>
+        apiGet<WeatherInsightDto>(`/api/insights/weather?plantingId=${planting.id}`),
+      ),
+    ),
+  ]);
+  const integrations = new Map(
+    integrationResults.flatMap((result) => (result.status === 'fulfilled' ? [result.value] : [])),
   );
   const temperatures = new Map(
     weatherResults.flatMap((result) =>
@@ -44,7 +47,7 @@ export default async function KebunkuPage() {
 
   return (
     <div className="page-shell stack">
-      <section className="verdict-card verdict-safe">
+      <section className="verdict-card hero-verdict verdict-safe">
         <p className="eyebrow">Kebunku</p>
         <h1 className="hero-title">
           {activeCount > 0 ? `${activeCount} tanaman aktif dipantau` : 'Tambahkan tanaman pertama'}
@@ -62,14 +65,17 @@ export default async function KebunkuPage() {
         <EmptyState message="Belum ada lahan. Mulai dengan menambah petak kebun." />
       ) : null}
 
-      <section className="stack" aria-label="Daftar lahan">
+      <section className="plot-grid" aria-label="Daftar lahan">
         {plots.map((plot) => {
           const plotPlantings = plantings.filter((planting) => planting.plotId === plot.id);
           const activePlanting = plotPlantings.find((planting) => planting.status === 'active');
           const integration = activePlanting ? integrations.get(activePlanting.id) : null;
           const weather = activePlanting ? temperatures.get(activePlanting.id) : null;
           return (
-            <Card key={plot.id}>
+            <Card
+              key={plot.id}
+              className={activePlanting ? 'plot-card plot-card-active' : 'plot-card'}
+            >
               <div className="stack">
                 <div>
                   <h2 className="flush">{plot.name}</h2>

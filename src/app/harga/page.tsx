@@ -25,7 +25,7 @@ export default async function HargaPage() {
 
   return (
     <div className="page-shell stack">
-      <section className="verdict-card verdict-safe">
+      <section className="verdict-card hero-verdict verdict-safe">
         <p className="eyebrow">Harga</p>
         <h1 className="hero-title">
           {nearest
@@ -49,60 +49,66 @@ export default async function HargaPage() {
         <p className="muted">Prediksi belum tersedia untuk {unavailableCount} tanaman.</p>
       ) : null}
 
-      {forecasts.map(({ planting, forecast }) => (
-        <Card key={planting.id}>
-          <div className="stack">
-            <div>
-              <h2 className="flush">{planting.cropName}</h2>
-              <p className="muted flush">
-                Harga terakhir: <strong>{formatRupiah(forecast.lastKnownPrice)}/kg</strong> ·{' '}
-                {formatDate(forecast.lastKnownDate)} · {forecast.market.replaceAll('_', ' ')},{' '}
-                {forecast.province}
-              </p>
-            </div>
-            <div className="scroll-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Tanggal</th>
-                    <th>Horizon</th>
-                    <th>Prediksi Harga</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {forecast.points.map((point) => (
-                    <tr
-                      key={point.targetDate}
-                      className={point.isBestSell ? 'best-sell-row' : undefined}
-                    >
-                      <td>{formatDate(point.targetDate)}</td>
-                      <td>{point.horizonDays} hari</td>
-                      <td>{formatRupiah(point.predictedPrice)}</td>
-                      <td>
-                        {point.isBestSell ? (
-                          <StatusBadge status="safe" label="Waktu Jual" />
-                        ) : (
-                          <StatusBadge status="watch" label="Pantau" />
-                        )}
-                      </td>
+      <section className="forecast-grid" aria-label="Daftar prediksi harga">
+        {forecasts.map(({ planting, forecast }) => (
+          <Card key={planting.id} className="forecast-card">
+            <div className="stack">
+              <div>
+                <h2 className="flush">{planting.cropName}</h2>
+                <p className="price-kicker">Harga terakhir</p>
+                <p className="price-value">
+                  {formatRupiah(forecast.lastKnownPrice)}
+                  <small>/kg</small>
+                </p>
+                <p className="muted flush">
+                  {formatDate(forecast.lastKnownDate)} · {forecast.market.replaceAll('_', ' ')},{' '}
+                  {forecast.province}
+                </p>
+              </div>
+              <div className="scroll-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Tanggal</th>
+                      <th>Horizon</th>
+                      <th>Prediksi Harga</th>
+                      <th>Status</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {forecast.points.map((point) => (
+                      <tr
+                        key={point.targetDate}
+                        className={point.isBestSell ? 'best-sell-row' : undefined}
+                      >
+                        <td>{formatDate(point.targetDate)}</td>
+                        <td>{point.horizonDays} hari</td>
+                        <td>{formatRupiah(point.predictedPrice)}</td>
+                        <td>
+                          {point.isBestSell ? (
+                            <StatusBadge status="safe" label="Waktu Jual" />
+                          ) : (
+                            <StatusBadge status="watch" label="Pantau" />
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="muted flush">
+                Sumber: {forecast.source}. Prediksi, bukan harga transaksi langsung.
+              </p>
+              <Button
+                endpoint={`/api/forecasts/prices/refresh?plantingId=${planting.id}`}
+                variant="secondary"
+              >
+                Segarkan
+              </Button>
             </div>
-            <p className="muted flush">
-              Sumber: {forecast.source}. Prediksi, bukan harga transaksi langsung.
-            </p>
-            <Button
-              endpoint={`/api/forecasts/prices/refresh?plantingId=${planting.id}`}
-              variant="secondary"
-            >
-              Segarkan
-            </Button>
-          </div>
-        </Card>
-      ))}
+          </Card>
+        ))}
+      </section>
     </div>
   );
 }

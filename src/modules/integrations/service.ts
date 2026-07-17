@@ -1,3 +1,4 @@
+import { AsyncTtlCache, envTimeout } from '@/lib/async-cache';
 import { NotFoundError } from '@/lib/errors';
 import { prisma } from '@/lib/prisma';
 import type {
@@ -7,9 +8,15 @@ import type {
 } from '@/types/api';
 
 export class IntegrationService {
+  private readonly cache = new AsyncTtlCache<PlantingIntegrationDto>(5 * 60 * 1000);
+
   constructor(private readonly request = postJson) {}
 
   async getPlantingData(plantingId: string): Promise<PlantingIntegrationDto> {
+    return this.cache.get(plantingId, () => this.loadPlantingData(plantingId));
+  }
+
+  private async loadPlantingData(plantingId: string): Promise<PlantingIntegrationDto> {
     const planting = await prisma.plantingCycle.findUnique({
       where: { id: plantingId },
       include: { crop: true },
@@ -76,7 +83,7 @@ async function postJson<T>(url: string, body: Record<string, string>): Promise<T
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
-    signal: AbortSignal.timeout(5_000),
+    signal: AbortSignal.timeout(envTimeout('INTEGRATION_API_TIMEOUT_MS', 2_000)),
     cache: 'no-store',
   });
   if (!response.ok) {

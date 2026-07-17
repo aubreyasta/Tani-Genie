@@ -84,7 +84,38 @@ PRICE_PREDICTION_API_URL=http://localhost:8000
 PLANTING_CALENDAR_API_URL=http://localhost:8001
 PRICE_PREDICTION_MARKET=pasar_tradisional
 PRICE_PREDICTION_PROVINCE="DI Yogyakarta"
+PEST_RISK_API_URL=http://localhost:8002
+PEST_RISK_PROVINCE="DI Yogyakarta"
 ```
+
+Untuk development lokal, timeout service eksternal dapat diatur agar halaman cepat gagal secara
+graceful ketika service Python atau NASA POWER belum aktif:
+
+```bash
+WEATHER_API_TIMEOUT_MS=8000
+PRICE_API_TIMEOUT_MS=5000
+INTEGRATION_API_TIMEOUT_MS=2000
+NASA_POWER_TIMEOUT_MS=8000
+PEST_RISK_API_TIMEOUT_MS=3000
+```
+
+Respons cuaca, kalender, harga, dan pest-risk yang berhasil disimpan singkat di memori server untuk
+mengurangi request berulang. Tombol **Segarkan** tetap memaksa pengambilan data terbaru.
+
+Jalankan service pest-risk dari worktree/folder terpisah:
+
+```bash
+cd pest
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+pip install -e .
+PYTHONPATH=src uvicorn pest_risk.api.main:app --port 8002
+```
+
+Halaman **Peringatan** mengirim histori cuaca harian nyata dari NASA POWER ke service tersebut.
+Jika histori cuaca, sensor IoT, atau service pest-risk belum tersedia, aplikasi tidak membuat data
+pengganti dan tetap menampilkan ringkasan cuaca generik sebagai fallback.
 
 Jika service Python tidak aktif, CRUD tanaman tetap berjalan dan hasil integrasi ditampilkan sebagai
 belum tersedia.

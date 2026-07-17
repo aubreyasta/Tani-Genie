@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+import { PestRiskLoading, PestRiskSection } from '@/components/features/PestRiskSection';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { VerdictCard } from '@/components/ui/VerdictCard';
@@ -27,7 +29,7 @@ export default async function PeringatanPage() {
 
   return (
     <div className="page-shell stack">
-      <section className={`verdict-card verdict-${top?.verdict.status ?? 'safe'}`}>
+      <section className={`verdict-card hero-verdict verdict-${top?.verdict.status ?? 'safe'}`}>
         <p className="eyebrow">Peringatan</p>
         <h1 className="hero-title">
           {top
@@ -108,8 +110,25 @@ export default async function PeringatanPage() {
                 mm
               </dd>
             </div>
+            <div>
+              <dt>Kecepatan angin</dt>
+              <dd>
+                {insight.weather.windSpeedKmh.toLocaleString('id-ID', {
+                  maximumFractionDigits: 1,
+                })}{' '}
+                km/jam
+              </dd>
+            </div>
           </dl>
           <VerdictCard verdict={insight.verdict} />
+          {(() => {
+            const planting = apiPlantings.find((item) => item.id === insight.planting.id);
+            return planting ? (
+              <Suspense fallback={<PestRiskLoading cropName={planting.cropName} />}>
+                <PestRiskSection planting={planting} />
+              </Suspense>
+            ) : null;
+          })()}
           <Button
             endpoint={`/api/insights/weather/refresh?plantingId=${insight.planting.id}`}
             variant="secondary"

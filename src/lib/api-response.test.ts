@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { handleError, success } from './api-response';
-import { NotFoundError, ValidationError } from './errors';
+import { NotFoundError, ServiceUnavailableError, ValidationError } from './errors';
 
 describe('API responses', () => {
   it('wraps successful data in the shared response envelope', async () => {
@@ -32,6 +32,16 @@ describe('API responses', () => {
     await expect(response.json()).resolves.toMatchObject({
       success: false,
       error: { code: 'NOT_FOUND' },
+    });
+  });
+
+  it('returns 503 for unavailable upstream services without logging internals', async () => {
+    const response = handleError(new ServiceUnavailableError('Model harga sedang tidak tersedia'));
+
+    expect(response.status).toBe(503);
+    await expect(response.json()).resolves.toMatchObject({
+      success: false,
+      error: { code: 'SERVICE_UNAVAILABLE', message: 'Model harga sedang tidak tersedia' },
     });
   });
 

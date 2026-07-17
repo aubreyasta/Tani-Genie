@@ -31,7 +31,7 @@ export default async function NotifikasiPage() {
 
   return (
     <div className="page-shell stack">
-      <section className="verdict-card verdict-watch">
+      <section className="verdict-card hero-verdict verdict-watch">
         <p className="eyebrow">Notifikasi</p>
         <h1 className="hero-title">
           {notifications.filter((item) => !item.isRead).length} belum dibaca
@@ -51,7 +51,10 @@ export default async function NotifikasiPage() {
         const itemDeliveries =
           deliveries.find((item) => item.id === notification.id)?.attempts ?? [];
         return (
-          <Card key={notification.id} className={notification.isRead ? '' : 'card-unread'}>
+          <Card
+            key={notification.id}
+            className={`notification-card ${notification.isRead ? '' : 'card-unread'}`}
+          >
             <div className="stack">
               <div className="row-between">
                 <StatusBadge

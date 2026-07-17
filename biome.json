@@ -16,6 +16,9 @@
       "**/*.css",
       "!.omo",
       "!.next",
+      "!pest",
+      "!tani-genie-planting-calendar",
+      "!tani-genie-price-prediction",
       "!node_modules"
     ]
   },

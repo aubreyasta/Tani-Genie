@@ -1,13 +1,20 @@
-import { NotFoundError } from '@/lib/errors';
+import { AsyncTtlCache, envTimeout } from '@/lib/async-cache';
+import { NotFoundError, ServiceUnavailableError } from '@/lib/errors';
 import { prisma } from '@/lib/prisma';
 import type { MlPricePredictionDto, PriceForecastDto } from '@/types/api';
 
 const FORECAST_HORIZONS = [7, 14, 21, 30] as const;
 
 export class PriceService {
+  private readonly cache = new AsyncTtlCache<PriceForecastDto>(5 * 60 * 1000);
+
   constructor(private readonly request = postPrediction) {}
 
   async getForecast(plantingId: string): Promise<PriceForecastDto> {
+    return this.cache.get(plantingId, () => this.loadForecast(plantingId));
+  }
+
+  private async loadForecast(plantingId: string): Promise<PriceForecastDto> {
     const planting = await prisma.plantingCycle.findUnique({
       where: { id: plantingId },
       include: { crop: true },
@@ -57,7 +64,7 @@ export class PriceService {
   }
 
   async refreshForecast(plantingId: string): Promise<PriceForecastDto> {
-    return this.getForecast(plantingId);
+    return this.cache.get(plantingId, () => this.loadForecast(plantingId), true);
   }
 }
 
@@ -79,15 +86,23 @@ async function postPrediction(
   url: string,
   body: Record<string, string>,
 ): Promise<MlPricePredictionDto> {
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-    signal: AbortSignal.timeout(15_000),
-    cache: 'no-store',
-  });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(envTimeout('PRICE_API_TIMEOUT_MS', 5_000)),
+      cache: 'no-store',
+    });
+  } catch (error) {
+    if (error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError')) {
+      throw new ServiceUnavailableError('Model prediksi harga membutuhkan waktu terlalu lama');
+    }
+    throw new ServiceUnavailableError('Model prediksi harga sedang tidak tersedia');
+  }
   if (!response.ok) {
-    throw new Error(`Price prediction request failed with status ${response.status}`);
+    throw new ServiceUnavailableError('Model prediksi harga sedang tidak tersedia');
   }
   return (await response.json()) as MlPricePredictionDto;
 }
