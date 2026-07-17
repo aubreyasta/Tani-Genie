@@ -16,10 +16,12 @@ from .tasks import TaskStore, generate_tasks, RISK_ACTIONS
 from .cost import estimate_cost, rupiah
 from .weather import fetch_nasa_power, get_temperature
 from .dashboard import plant_dashboard
+from .catalog import Kebunku, Plot, Planting, DATA_POINTS, DATA_SOURCES
 
 __all__ = [
     "CROPS", "list_crops", "build_calendar", "get_status",
     "gdd_status", "daily_gdd", "gdd_stage", "estimate_cost", "rupiah",
     "TaskStore", "generate_tasks", "RISK_ACTIONS",
+    "Kebunku", "Plot", "Planting", "DATA_POINTS", "DATA_SOURCES",
     "fetch_nasa_power", "get_temperature", "plant_dashboard",
 ]
