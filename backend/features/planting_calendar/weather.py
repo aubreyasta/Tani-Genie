@@ -9,10 +9,10 @@ import requests
 import pandas as pd
 
 
-def fetch_nasa_power(lat, lon, start, end):
+def fetch_nasa_power(lat, lon, start, end, parameters="T2M_MAX,T2M_MIN"):
     url = "https://power.larc.nasa.gov/api/temporal/daily/point"
     params = {
-        "parameters": "T2M_MAX,T2M_MIN",
+        "parameters": parameters,
         "community": "ag",
         "latitude": lat,
         "longitude": lon,
