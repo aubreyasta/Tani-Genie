@@ -63,11 +63,11 @@ export function Navbar() {
     <>
       <header className="site-header">
         <nav aria-label="Navigasi utama" className="navbar">
-          <Link href="/" className="brand" aria-label="Tanigata, beranda">
+          <Link href="/" className="brand" aria-label="Tani Genie, beranda">
             <span className="brand-mark" aria-hidden="true">
               T
             </span>
-            <span>Tanigata</span>
+            <span>Tani Genie</span>
           </Link>
           <div className="nav-context">
             <strong>Teman tani digital</strong>
