@@ -5,7 +5,7 @@ export function Loading() {
         <div className="loading-brand" aria-hidden="true">
           <span>T</span>
         </div>
-        <p className="eyebrow">Tanigata sedang menyiapkan lahanmu</p>
+        <p className="eyebrow">Tani Genie sedang menyiapkan lahanmu</p>
         <h1>Merangkai data menjadi langkah yang sederhana.</h1>
         <p className="loading-label">Mengambil cuaca, tanaman, harga, dan peringatan terbaru…</p>
         <div className="loading-progress" aria-hidden="true">
