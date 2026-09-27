@@ -7,7 +7,7 @@ import { OfflineBanner } from '@/components/layout/OfflineBanner';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Tanigata — Teman Tani Indonesia',
+  title: 'Tani Genie - Teman Tani Indonesia',
   description: 'Pendamping keputusan iklim dan harga untuk petani kecil Indonesia.',
   manifest: '/manifest.webmanifest',
 };

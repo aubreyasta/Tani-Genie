@@ -54,12 +54,12 @@ export default async function HomePage() {
       <section
         className={`verdict-card hero-verdict verdict-${topWeather?.verdict.status ?? 'safe'}`}
       >
-        <p className="eyebrow">Tanigata</p>
+        <p className="eyebrow">Tani Genie</p>
         <h1 className="home-title">Selamat datang, {farmer.name}</h1>
         <p className="home-copy">
           {topWeather
             ? topWeather.verdict.reason
-            : 'Tambahkan tanaman agar Tanigata bisa memberi keputusan hari ini.'}
+            : 'Tambahkan tanaman agar Tani Genie bisa memberi keputusan hari ini.'}
         </p>
       </section>
 
@@ -94,7 +94,7 @@ export default async function HomePage() {
 
       <section aria-labelledby="feature-heading">
         <p className="eyebrow" id="feature-heading">
-          Jelajahi Tanigata
+          Jelajahi Tani Genie
         </p>
         <div className="dashboard-grid feature-grid">
           {featureCards.map((card) => (

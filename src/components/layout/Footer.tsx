@@ -3,9 +3,10 @@ export function Footer() {
     <footer className="site-footer">
       <div className="footer-content">
         <p>
-          Cuaca: NASA POWER · Harga: model prediksi TaniGenie · Risiko penyakit: kondisi lingkungan.
+          Cuaca: NASA POWER · Harga: model prediksi Tani Genie · Risiko penyakit: kondisi
+          lingkungan.
         </p>
-        <p>Tanigata — teman perjalanan tani, bukan pengganti inspeksi lapangan.</p>
+        <p>Tani Genie - teman perjalanan tani, bukan pengganti inspeksi lapangan.</p>
       </div>
     </footer>
   );
